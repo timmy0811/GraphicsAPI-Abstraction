@@ -1,0 +1,8 @@
+*.opendb
+*.*db*
+*.vs/
+*.user
+*.sln
+*.vcxproj
+*.filters
+*.aps
