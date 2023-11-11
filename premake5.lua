@@ -22,7 +22,6 @@ project "GraphicsAPI"
 
 	includedirs{
 		"dependencies/assimp-5.2.5/include",
-		"dependencies/yaml-cpp/include",
 		"src",
 		"../%{IncludeDirs.GLEW}",
 		"../%{IncludeDirs.spdlog}"
@@ -37,14 +36,12 @@ project "GraphicsAPI"
 
 		links{
 			"assimp-vc142-mtd.lib",
-			"yaml-cppd.lib",
 			"opengl32.lib",
 			"GLEW"
 		}
 
 		libdirs{
-			"dependencies/assimp-5.2.5/lib/Debug",
-			"dependencies/yaml-cpp/lib/Debug"
+			"dependencies/assimp-5.2.5/lib/Debug"
 		}
 
 	filter {"configurations:Release", "configurations:Dist"}

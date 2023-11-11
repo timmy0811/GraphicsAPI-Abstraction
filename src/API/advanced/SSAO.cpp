@@ -30,7 +30,7 @@ void API::Advanced::SSAO::GenerateSampleKernel(int samples)
 
 inline API::Advanced::SSAO* API::Advanced::SSAO::Create()
 {
-	switch (API::Core::RendererContext::GetAPI())
+	switch (API::Core::DefaultRendererContext::GetAPI())
 	{
 	case API::Core::RendererAPI::API_ENUM::None:    API_ASSERT(false, "RendererAPI::None is currently not supported!"); return nullptr;
 	case API::Core::RendererAPI::API_ENUM::OpenGL:  return new OpenGL::Advanced::SSAO_OpenGL();

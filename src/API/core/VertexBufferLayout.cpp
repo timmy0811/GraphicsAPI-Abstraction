@@ -12,7 +12,7 @@ API::Core::VertexBufferLayout* API::Core::VertexBufferLayout::Create()
 
 int API::Core::VertexBufferElement::GetAPIDataType(ShaderDataType dataType)
 {
-	switch (RendererContext::GetAPI()) {
+	switch (DefaultRendererContext::GetAPI()) {
 	case RendererAPI::API_ENUM::None:
 		API_ASSERT(false, "RendererAPI::None is currently not supported!");
 		return 0;

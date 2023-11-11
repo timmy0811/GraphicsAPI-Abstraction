@@ -8,7 +8,7 @@
 
 void API::Legacy::LegacyRenderer::Init()
 {
-	switch (API::Core::RendererContext::GetAPI())
+	switch (API::Core::DefaultRendererContext::GetAPI())
 	{
 	case API::Core::RendererAPI::API_ENUM::None:    API_ASSERT(false, "RendererAPI::None is currently not supported!"); break;
 	case API::Core::RendererAPI::API_ENUM::OpenGL: {
@@ -19,7 +19,7 @@ void API::Legacy::LegacyRenderer::Init()
 
 void API::Legacy::LegacyRenderer::BindOrigFramebuffer()
 {
-	switch (API::Core::RendererContext::GetAPI())
+	switch (API::Core::DefaultRendererContext::GetAPI())
 	{
 	case API::Core::RendererAPI::API_ENUM::None:    API_ASSERT(false, "RendererAPI::None is currently not supported!"); break;
 	case API::Core::RendererAPI::API_ENUM::OpenGL: {
@@ -30,7 +30,7 @@ void API::Legacy::LegacyRenderer::BindOrigFramebuffer()
 
 void API::Legacy::LegacyRenderer::Clear()
 {
-	switch (API::Core::RendererContext::GetAPI())
+	switch (API::Core::DefaultRendererContext::GetAPI())
 	{
 	case API::Core::RendererAPI::API_ENUM::None:    API_ASSERT(false, "RendererAPI::None is currently not supported!"); break;
 	case API::Core::RendererAPI::API_ENUM::OpenGL: {
@@ -41,7 +41,7 @@ void API::Legacy::LegacyRenderer::Clear()
 
 void API::Legacy::LegacyRenderer::ClearDepthBufferOnly()
 {
-	switch (API::Core::RendererContext::GetAPI())
+	switch (API::Core::DefaultRendererContext::GetAPI())
 	{
 	case API::Core::RendererAPI::API_ENUM::None:    API_ASSERT(false, "RendererAPI::None is currently not supported!"); break;
 	case API::Core::RendererAPI::API_ENUM::OpenGL: {
@@ -52,7 +52,7 @@ void API::Legacy::LegacyRenderer::ClearDepthBufferOnly()
 
 void API::Legacy::LegacyRenderer::Draw(const Core::VertexArray& va, const Core::IndexBuffer& ib, const Core::Shader& shader, int mode, int count)
 {
-	switch (API::Core::RendererContext::GetAPI())
+	switch (API::Core::DefaultRendererContext::GetAPI())
 	{
 	case API::Core::RendererAPI::API_ENUM::None:    API_ASSERT(false, "RendererAPI::None is currently not supported!"); break;
 	case API::Core::RendererAPI::API_ENUM::OpenGL: {
@@ -67,7 +67,7 @@ void API::Legacy::LegacyRenderer::Draw(const Core::VertexArray& va, const Core::
 
 void API::Legacy::LegacyRenderer::Draw(const Core::VertexArray& va, const Core::IndexBuffer& ib, const Core::Shader& shader, size_t count)
 {
-	switch (API::Core::RendererContext::GetAPI())
+	switch (API::Core::DefaultRendererContext::GetAPI())
 	{
 	case API::Core::RendererAPI::API_ENUM::None:    API_ASSERT(false, "RendererAPI::None is currently not supported!"); break;
 	case API::Core::RendererAPI::API_ENUM::OpenGL: {
@@ -81,7 +81,7 @@ void API::Legacy::LegacyRenderer::Draw(const Core::VertexArray& va, const Core::
 
 void API::Legacy::LegacyRenderer::DrawArray(const Core::VertexArray& va, const Core::Shader& shader, size_t first, size_t count)
 {
-	switch (API::Core::RendererContext::GetAPI())
+	switch (API::Core::DefaultRendererContext::GetAPI())
 	{
 	case API::Core::RendererAPI::API_ENUM::None:    API_ASSERT(false, "RendererAPI::None is currently not supported!"); break;
 	case API::Core::RendererAPI::API_ENUM::OpenGL: {
@@ -94,7 +94,7 @@ void API::Legacy::LegacyRenderer::DrawArray(const Core::VertexArray& va, const C
 
 void API::Legacy::LegacyRenderer::DrawInstancedLines(const Core::VertexArray& va, const Core::IndexBuffer& ib, const Core::Shader& shader, size_t count, size_t instances)
 {
-	switch (API::Core::RendererContext::GetAPI())
+	switch (API::Core::DefaultRendererContext::GetAPI())
 	{
 	case API::Core::RendererAPI::API_ENUM::None:    API_ASSERT(false, "RendererAPI::None is currently not supported!"); break;
 	case API::Core::RendererAPI::API_ENUM::OpenGL: {

@@ -3,7 +3,11 @@
 #include "RendererCommand.h"
 
 namespace API::Core {
-	class RendererContext {
+
+	// This class can be seen as a template clas for RendererContexts that can be implemented in the user application
+	// if it is nessecary.
+
+	class DefaultRendererContext {
 	public:
 		static void BeginScene();
 		static void EndScene();

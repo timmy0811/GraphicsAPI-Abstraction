@@ -6,7 +6,7 @@
 
 API::Core::VertexBuffer* API::Core::VertexBuffer::Create(const void* data, unsigned int size)
 {
-	switch (API::Core::RendererContext::GetAPI())
+	switch (API::Core::DefaultRendererContext::GetAPI())
 	{
 	case API::Core::RendererAPI::API_ENUM::None:    API_ASSERT(false, "RendererAPI::None is currently not supported!"); return nullptr;
 	case API::Core::RendererAPI::API_ENUM::OpenGL:  return new OpenGL::Core::VertexBuffer_OpenGL(data, size);
@@ -18,7 +18,7 @@ API::Core::VertexBuffer* API::Core::VertexBuffer::Create(const void* data, unsig
 
 API::Core::VertexBuffer* API::Core::VertexBuffer::Create(unsigned int count, size_t elementSize)
 {
-	switch (API::Core::RendererContext::GetAPI())
+	switch (API::Core::DefaultRendererContext::GetAPI())
 	{
 	case API::Core::RendererAPI::API_ENUM::None:    API_ASSERT(false, "RendererAPI::None is currently not supported!"); return nullptr;
 	case API::Core::RendererAPI::API_ENUM::OpenGL:  return new OpenGL::Core::VertexBuffer_OpenGL(count, elementSize);
