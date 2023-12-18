@@ -1,3 +1,5 @@
+<img align="left" src="https://github.com/timmy0811/GraphicsAPI-Abstraction/blob/Projects/logo0.png" width="200" height="200">
+
 # GraphicsAPIAbstraction
 A wrapper library for abstracting the most common graphics-APIs like OpenGL, Vulkan, Direct3D. This Library will grow with time...
 
