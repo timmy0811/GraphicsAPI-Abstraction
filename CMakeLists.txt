@@ -31,4 +31,4 @@ target_link_libraries(GLWrapper PUBLIC glew_s)
 target_link_libraries(GLWrapper PUBLIC spdlog)
 # target_link_libraries(GLWrapper PUBLIC glm)
 
-target_include_directories(GLWrapper PUBLIC ${CMAKE_SOURCE_DIR}/dependencies/glew-2.2.0/include)
+target_include_directories(GLWrapper PUBLIC ${CMAKE_SOURCE_DIR}/dependencies/glew/include)

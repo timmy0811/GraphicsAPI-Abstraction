@@ -229,17 +229,40 @@ unsigned int OpenGL::Core::Shader_OpenGL::CompileShader(unsigned int type, const
 const std::string OpenGL::Core::Shader_OpenGL::StringFromPath(const std::string& path)
 {
 	std::ifstream stream(path);
+	if (!stream.is_open()) {
+		throw std::runtime_error("Failed to open shader file: " + path);
+	}
 
 	std::string line;
 	std::stringstream ss;
 	bool isValid = false;
+
+	std::string basePath = path.substr(0, path.find_last_of("/\\"));
 
 	while (getline(stream, line)) {
 		if (line.find("//shader") != std::string::npos) {
 			isValid = true;
 		}
 		else if (isValid) {
-			ss << line << "\n";
+			if (line.find("#include") != std::string::npos) {
+				size_t start = line.find_first_of("\"<") + 1;
+				size_t end = line.find_last_of("\">");
+				std::string includeFile = line.substr(start, end - start);
+
+				std::string fullPath = basePath + "/" + includeFile;
+
+				std::ifstream includeStream(fullPath);
+				if (!includeStream.is_open()) {
+					throw std::runtime_error("Failed to open included file: " + fullPath);
+				}
+
+				std::stringstream includeContent;
+				includeContent << includeStream.rdbuf();
+
+				ss << includeContent.str() << "\n";
+			}
+			else
+				ss << line << "\n";
 		}
 	}
 	return ss.str();

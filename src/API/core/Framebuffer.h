@@ -5,27 +5,44 @@
 
 #include <vector>
 
+#include <GL/glew.h>
+
 #define MAX_BUF 8
 
 namespace API::Core {
+	enum BufferDataType {
+		_FLOAT = 0x1406,
+		_FLOAT16 = 1,
+		_DOUBLE = 0x140A,
+		_BYTE_UNSIGNED = 0x1401,
+		_BYTE = 0x1400,
+		_SHORT = 0x1402,
+		_SHORT_UNSIGNED = 0x1403,
+		_INT_UNSIGNED = 0x1405,
+		_INT = 0x1404,
+		_NONE = 0
+	};
+
+	enum WrapMethod {
+		NEAREST = 0x2600,
+		LINEAR = 0x2601,
+		CLAMP_TO_EDGE = 0x812F,
+		MIRRORED_REPEAT = 0x8370,
+		REPEAT = 0x2901,
+		CLAMP_TO_BORDER = 0x812D,
+		MIRROR_CLAMP_TO_EDGE = 0x8743,
+
+		NEAREST_MIPMAP_NEAREST = 0x2700,
+		LINEAR_MIPMAP_NEAREST = 0x2701,
+		NEAREST_MIPMAP_LINEAR = 0x2702,
+		LINEAR_MIPMAP_LINEAR = 0x2703
+	};
+
+	enum class DepthBufferType { WRITE_ONLY, WRITE_READ };
+
 	class Framebuffer
 	{
 	public:
-		enum class DepthBufferType { WRITE_ONLY, WRITE_READ };
-
-		enum BufferDataType {
-			_FLOAT = 0x1406,
-			_FLOAT16 = 1,
-			_DOUBLE = 0x140A,
-			_BYTE_UNSIGNED = 0x1401,
-			_BYTE = 0x1400,
-			_SHORT = 0x1402,
-			_SHORT_UNSIGNED = 0x1403,
-			_INT_UNSIGNED = 0x1405,
-			_INT = 0x1404,
-			_NONE = 0
-		};
-
 		enum BufferFormat {
 			RGBA32F = 0x8814,
 			RGB32F = 0x8815,
