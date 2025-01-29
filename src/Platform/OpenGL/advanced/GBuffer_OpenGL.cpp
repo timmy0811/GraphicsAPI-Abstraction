@@ -74,7 +74,7 @@ unsigned int OpenGL::Advanced::GBuffer_OpenGL::GetTargetInternalId(const std::st
 	return 0;
 }
 
-const std::string& OpenGL::Advanced::GBuffer_OpenGL::GetTargetIdentifier(unsigned int internalId)
+const std::string OpenGL::Advanced::GBuffer_OpenGL::GetTargetIdentifier(unsigned int internalId)
 {
 	for (const auto& target : Targets) {
 		if (target.second == internalId) {
@@ -83,7 +83,7 @@ const std::string& OpenGL::Advanced::GBuffer_OpenGL::GetTargetIdentifier(unsigne
 	}
 
 	LOG_GL_WARN("Target not found: " + std::to_string(internalId) + ". Returning empty Identifier.");
-	return std::string();
+	return "";
 }
 
 unsigned int OpenGL::Advanced::GBuffer_OpenGL::AddRenderTarget(const std::string& identifier, unsigned int width, unsigned int height, unsigned int components, API::Core::BufferDataType datatype, API::Core::WrapMethod wrap, void* data)
@@ -101,7 +101,7 @@ unsigned int OpenGL::Advanced::GBuffer_OpenGL::AddRenderTarget(const std::string
 	GLCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrap));
 	GLCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrap));
 
-	GLCall(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + Targets.size() - 1, GL_TEXTURE_2D, Targets.back().second, 0));
+	GLCall(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + static_cast<unsigned int>(Targets.size() - 1), GL_TEXTURE_2D, Targets.back().second, 0));
 
 	return Targets.back().second;
 }
@@ -177,7 +177,7 @@ OpenGL::Advanced::GBuffer_OpenGL::TextureFormat OpenGL::Advanced::GBuffer_OpenGL
 	case 4: format.Format = GL_RGBA; break;
 	default:
 		LOG_GL_ERROR("Invalid component count: must be 1, 2, 3, or 4.");
-		return format;
+		return {};
 	}
 
 	switch (datatype) {
@@ -255,7 +255,7 @@ OpenGL::Advanced::GBuffer_OpenGL::TextureFormat OpenGL::Advanced::GBuffer_OpenGL
 
 	case API::Core::BufferDataType::_NONE:
 		LOG_GL_ERROR("Invalid BufferDataType: _NONE is not a valid texture data type.");
-
+		break;
 	default:
 		LOG_GL_ERROR("Unknown BufferDataType.");
 	}

@@ -1,7 +1,7 @@
 #include "glpch.h"
 #include "Framebuffer_OpenGL.h"
 
-OpenGL::Core::Framebuffer_OpenGL::Framebuffer_OpenGL(const glm::ivec2& size, bool attachDepth, DepthBufferType depthType)
+OpenGL::Core::Framebuffer_OpenGL::Framebuffer_OpenGL(const glm::ivec2& size, bool attachDepth, API::Core::DepthBufferType depthType)
 {
 	m_Width = size.x;
 	m_Height = size.y;
@@ -14,14 +14,14 @@ OpenGL::Core::Framebuffer_OpenGL::Framebuffer_OpenGL(const glm::ivec2& size, boo
 	if (attachDepth) {
 		switch (depthType)
 		{
-		case DepthBufferType::WRITE_ONLY:
+		case API::Core::DepthBufferType::WRITE_ONLY:
 			glGenRenderbuffers(1, &m_RBODepth);
 			glBindRenderbuffer(GL_RENDERBUFFER, m_RBODepth);
 			glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, m_Width, m_Height);
 			glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, m_RBODepth);
 
 			break;
-		case DepthBufferType::WRITE_READ:
+		case API::Core::DepthBufferType::WRITE_READ:
 			GLCall(glGenTextures(1, &m_RBODepth));
 			GLCall(glBindTexture(GL_TEXTURE_2D, m_RBODepth));
 			GLCall(glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, m_Width, m_Height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL));
@@ -133,138 +133,16 @@ void OpenGL::Core::Framebuffer_OpenGL::BindTexture(int index, const unsigned int
 	GLCall(glBindTexture(GL_TEXTURE_2D, m_Buffers[index]));
 }
 
-bool OpenGL::Core::Framebuffer_OpenGL::PushColorAttribute(const char channel, BufferDataType dataType, const void* data)
+bool OpenGL::Core::Framebuffer_OpenGL::PushColorAttribute(const char channel, API::Core::BufferDataType dataType, const void* data)
 {
-	BufferFormat formatIntern{};
-	BufferFormat format{};
-
-	switch (channel) {
-	case(1):
-		format = BufferFormat::R;
-
-		switch (dataType)
-		{
-		case _FLOAT:
-			formatIntern = BufferFormat::R32F; break;
-		case _FLOAT16:
-			formatIntern = BufferFormat::R16F;
-			dataType = BufferDataType::_FLOAT; break;
-		case _DOUBLE:
-			return false;
-		case _BYTE_UNSIGNED:
-			formatIntern = BufferFormat::R; break;
-		case _BYTE:
-			formatIntern = BufferFormat::R8I; break;
-		case _SHORT:
-			formatIntern = BufferFormat::R16I; break;
-		case _SHORT_UNSIGNED:
-			formatIntern = BufferFormat::R16UI; break;
-		case _INT_UNSIGNED:
-			formatIntern = BufferFormat::R32UI; break;
-		case _INT:
-			formatIntern = BufferFormat::R32I; break;
-		default:
-			return false;
-		}
-		break;
-
-	case(2):
-		format = BufferFormat::RG;
-
-		switch (dataType)
-		{
-		case _FLOAT:
-			formatIntern = BufferFormat::RG32F; break;
-		case _FLOAT16:
-			formatIntern = BufferFormat::RG16F;
-			dataType = BufferDataType::_FLOAT; break;
-		case _DOUBLE:
-			return false;
-		case _BYTE_UNSIGNED:
-			formatIntern = BufferFormat::RG; break;
-		case _BYTE:
-			formatIntern = BufferFormat::RG8I; break;
-		case _SHORT:
-			formatIntern = BufferFormat::RG16I; break;
-		case _SHORT_UNSIGNED:
-			formatIntern = BufferFormat::RG16UI; break;
-		case _INT_UNSIGNED:
-			formatIntern = BufferFormat::RG32UI; break;
-		case _INT:
-			formatIntern = BufferFormat::RG32I; break;
-		default:
-			return false;
-		}
-		break;
-
-	case(3):
-		format = BufferFormat::RGB;
-
-		switch (dataType)
-		{
-		case _FLOAT:
-			formatIntern = BufferFormat::RGB32F; break;
-		case _FLOAT16:
-			formatIntern = BufferFormat::RGB16F;
-			dataType = BufferDataType::_FLOAT; break;
-		case _DOUBLE:
-			return false;
-		case _BYTE_UNSIGNED:
-			formatIntern = BufferFormat::RGB; break;
-		case _BYTE:
-			formatIntern = BufferFormat::RGB8I; break;
-		case _SHORT:
-			formatIntern = BufferFormat::RGB16I; break;
-		case _SHORT_UNSIGNED:
-			formatIntern = BufferFormat::RGB16UI; break;
-		case _INT_UNSIGNED:
-			formatIntern = BufferFormat::RGB32UI; break;
-		case _INT:
-			formatIntern = BufferFormat::RGB32I; break;
-		default:
-			return false;
-		}
-		break;
-
-	case(4):
-		format = BufferFormat::RGBA;
-
-		switch (dataType)
-		{
-		case _FLOAT:
-			formatIntern = BufferFormat::RGBA32F; break;
-		case _FLOAT16:
-			formatIntern = BufferFormat::RGBA16F;
-			dataType = BufferDataType::_FLOAT; break;
-		case _DOUBLE:
-			return false;
-		case _BYTE_UNSIGNED:
-			formatIntern = BufferFormat::RGBA; break;
-		case _BYTE:
-			formatIntern = BufferFormat::RGBA8I; break;
-		case _SHORT:
-			formatIntern = BufferFormat::RGBA16I; break;
-		case _SHORT_UNSIGNED:
-			formatIntern = BufferFormat::RGBA16UI; break;
-		case _INT_UNSIGNED:
-			formatIntern = BufferFormat::RGBA32UI; break;
-		case _INT:
-			formatIntern = BufferFormat::RGBA32I; break;
-		default:
-			return false;
-		}
-		break;
-
-	default:
-		return false;
-	}
+	TextureFormat format = GetTextureFormat(channel, dataType);
 
 	size_t size = m_Buffers.size();
 	m_Buffers.push_back(0);
 
 	GLCall(glGenTextures(1, &(m_Buffers[size])));
 	GLCall(glBindTexture(GL_TEXTURE_2D, m_Buffers[size]));
-	GLCall(glTexImage2D(GL_TEXTURE_2D, 0, formatIntern, m_Width, m_Height, 0, format, dataType, data));
+	GLCall(glTexImage2D(GL_TEXTURE_2D, 0, format.InternalFormat, m_Width, m_Height, 0, format.Format, format.Type, data));
 	GLCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST));
 	GLCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST));
 	GLCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE));
@@ -315,4 +193,101 @@ inline bool OpenGL::Core::Framebuffer_OpenGL::Validate() const
 
 	GLCall(glBindFramebuffer(GL_FRAMEBUFFER, 0));
 	return true;
+}
+
+OpenGL::Core::Framebuffer_OpenGL::TextureFormat OpenGL::Core::Framebuffer_OpenGL::GetTextureFormat(unsigned int components, API::Core::BufferDataType datatype)
+{
+	TextureFormat format;
+
+	switch (components) {
+	case 1: format.Format = GL_RED; break;
+	case 2: format.Format = GL_RG; break;
+	case 3: format.Format = GL_RGB; break;
+	case 4: format.Format = GL_RGBA; break;
+	default:
+		LOG_GL_ERROR("Invalid component count: must be 1, 2, 3, or 4.");
+		return {};
+	}
+
+	switch (datatype) {
+	case API::Core::BufferDataType::_FLOAT:
+		format.InternalFormat = (components == 1) ? GL_R32F :
+			(components == 2) ? GL_RG32F :
+			(components == 3) ? GL_RGB32F :
+			GL_RGBA32F;
+		format.Type = GL_FLOAT;
+		break;
+
+	case API::Core::BufferDataType::_FLOAT16:
+		format.InternalFormat = (components == 1) ? GL_R16F :
+			(components == 2) ? GL_RG16F :
+			(components == 3) ? GL_RGB16F :
+			GL_RGBA16F;
+		format.Type = GL_HALF_FLOAT;
+		break;
+
+	case API::Core::BufferDataType::_DOUBLE:
+		format.InternalFormat = (components == 1) ? GL_R32F :
+			(components == 2) ? GL_RG32F :
+			(components == 3) ? GL_RGB32F :
+			GL_RGBA32F;
+		format.Type = GL_DOUBLE;
+		break;
+
+	case API::Core::BufferDataType::_BYTE_UNSIGNED:
+		format.InternalFormat = (components == 1) ? GL_R8 :
+			(components == 2) ? GL_RG8 :
+			(components == 3) ? GL_RGB8 :
+			GL_RGBA8;
+		format.Type = GL_UNSIGNED_BYTE;
+		break;
+
+	case API::Core::BufferDataType::_BYTE:
+		format.InternalFormat = (components == 1) ? GL_R8_SNORM :
+			(components == 2) ? GL_RG8_SNORM :
+			(components == 3) ? GL_RGB8_SNORM :
+			GL_RGBA8_SNORM;
+		format.Type = GL_BYTE;
+		break;
+
+	case API::Core::BufferDataType::_SHORT:
+		format.InternalFormat = (components == 1) ? GL_R16_SNORM :
+			(components == 2) ? GL_RG16_SNORM :
+			(components == 3) ? GL_RGB16_SNORM :
+			GL_RGBA16_SNORM;
+		format.Type = GL_SHORT;
+		break;
+
+	case API::Core::BufferDataType::_SHORT_UNSIGNED:
+		format.InternalFormat = (components == 1) ? GL_R16 :
+			(components == 2) ? GL_RG16 :
+			(components == 3) ? GL_RGB16 :
+			GL_RGBA16;
+		format.Type = GL_UNSIGNED_SHORT;
+		break;
+
+	case API::Core::BufferDataType::_INT:
+		format.InternalFormat = (components == 1) ? GL_R32I :
+			(components == 2) ? GL_RG32I :
+			(components == 3) ? GL_RGB32I :
+			GL_RGBA32I;
+		format.Type = GL_INT;
+		break;
+
+	case API::Core::BufferDataType::_INT_UNSIGNED:
+		format.InternalFormat = (components == 1) ? GL_R32UI :
+			(components == 2) ? GL_RG32UI :
+			(components == 3) ? GL_RGB32UI :
+			GL_RGBA32UI;
+		format.Type = GL_UNSIGNED_INT;
+		break;
+
+	case API::Core::BufferDataType::_NONE:
+		LOG_GL_ERROR("Invalid BufferDataType: _NONE is not a valid texture data type.");
+		break;
+	default:
+		LOG_GL_ERROR("Unknown BufferDataType.");
+	}
+
+	return format;
 }

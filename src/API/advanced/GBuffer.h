@@ -17,7 +17,7 @@ namespace API::Advanced {
 		virtual void BindTextures(unsigned int startSlot = 0) = 0;
 
 		virtual unsigned int GetTargetInternalId(const std::string& identifier) = 0;
-		virtual const std::string& GetTargetIdentifier(unsigned int internalId) = 0;
+		virtual const std::string GetTargetIdentifier(unsigned int internalId) = 0;
 
 		virtual void BindDepthTexture(unsigned int slot) = 0;
 

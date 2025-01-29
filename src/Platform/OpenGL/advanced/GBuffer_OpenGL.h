@@ -21,7 +21,7 @@ namespace OpenGL::Advanced {
 		void BindTextures(unsigned int startSlot = 0) override;
 
 		unsigned int GetTargetInternalId(const std::string& identifier) override;
-		const std::string& GetTargetIdentifier(unsigned int internalId) override;
+		const std::string GetTargetIdentifier(unsigned int internalId) override;
 
 		unsigned int AddRenderTarget(const std::string& identifier, unsigned int width, unsigned int height, unsigned int components, API::Core::BufferDataType datatype, API::Core::WrapMethod wrap = API::Core::WrapMethod::CLAMP_TO_EDGE, void* data = nullptr) override;
 		unsigned int AddRenderTarget(const std::string& identifier, unsigned int components, API::Core::BufferDataType datatype, API::Core::WrapMethod wrap = API::Core::WrapMethod::CLAMP_TO_EDGE, void* data = nullptr) override;

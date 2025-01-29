@@ -20,7 +20,7 @@ void OpenGL::Core::RendererAPI_OpenGL::Clear()
 
 void OpenGL::Core::RendererAPI_OpenGL::Draw(const std::shared_ptr<API::Core::VertexArray>& vertexArray, size_t size)
 {
-	GLCall(glDrawArrays(GL_TRIANGLES, 0, size));
+	GLCall(glDrawArrays(GL_TRIANGLES, 0, (GLsizei)size));
 }
 
 void OpenGL::Core::RendererAPI_OpenGL::DrawIndexed(const std::shared_ptr<API::Core::VertexArray>& vertexArray, const std::shared_ptr<API::Core::IndexBuffer>& indexBuffer)
@@ -30,7 +30,7 @@ void OpenGL::Core::RendererAPI_OpenGL::DrawIndexed(const std::shared_ptr<API::Co
 
 void OpenGL::Core::RendererAPI_OpenGL::DrawInstanced(const std::shared_ptr<API::Core::VertexArray>& vertexArray, size_t size, unsigned int instances)
 {
-	GLCall(glDrawArraysInstanced(GL_TRIANGLES, 0, size, instances));
+	GLCall(glDrawArraysInstanced(GL_TRIANGLES, 0, (GLsizei)size, instances));
 }
 
 void OpenGL::Core::RendererAPI_OpenGL::DrawInstanced(const std::shared_ptr<API::Core::VertexArray>& vertexArray, const std::shared_ptr<API::Core::IndexBuffer>& indexBuffer, unsigned int instances)
