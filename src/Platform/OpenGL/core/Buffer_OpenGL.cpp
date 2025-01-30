@@ -21,15 +21,19 @@ OpenGL::Core::Buffer_OpenGL::Buffer_OpenGL(BufferType type, unsigned int count, 
 	m_BufferSize = (size_t)count * elementSize;
 }
 
-void OpenGL::Core::Buffer_OpenGL::AddData(const void* data, int size, int offset) {
+size_t OpenGL::Core::Buffer_OpenGL::AddData(const void* data, int size, int offset) {
 	Bind();
 	GLCall(glBufferSubData(this->type, offset, size, data));
+
+	return offset;
 }
 
-void OpenGL::Core::Buffer_OpenGL::AddData(const void* data, int size) {
+size_t OpenGL::Core::Buffer_OpenGL::AddData(const void* data, int size) {
 	Bind();
 	GLCall(glBufferSubData(this->type, m_DataPtr, size, data));
 	m_DataPtr += size;
+
+	return m_DataPtr;
 }
 
 void OpenGL::Core::Buffer_OpenGL::SetData(const void* data, int size)

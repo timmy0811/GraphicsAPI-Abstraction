@@ -21,8 +21,8 @@ namespace API::Core {
 
 		virtual ~Buffer() = default;
 
-		virtual void AddData(const void* data, int size, int offset) = 0;
-		virtual void AddData(const void* data, int size) = 0;
+		virtual size_t AddData(const void* data, int size, int offset) = 0;
+		virtual size_t AddData(const void* data, int size) = 0;
 
 		virtual void SetData(const void* data, int size) = 0;
 		virtual void SetDataDynamic(const void* data, int size) = 0;

@@ -13,8 +13,8 @@ namespace OpenGL::Core {
 		Buffer_OpenGL(BufferType type, unsigned int count, size_t elementSize);
 		~Buffer_OpenGL() override;
 
-		void AddData(const void* data, int size, int offset) override;
-		void AddData(const void* data, int size) override;
+		size_t AddData(const void* data, int size, int offset) override;
+		size_t AddData(const void* data, int size) override;
 
 		void SetData(const void* data, int size) override;
 		void SetDataDynamic(const void* data, int size) override;

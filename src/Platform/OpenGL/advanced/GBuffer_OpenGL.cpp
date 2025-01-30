@@ -6,16 +6,8 @@
 OpenGL::Advanced::GBuffer_OpenGL::GBuffer_OpenGL(unsigned int width, unsigned int height)
 	: Width(width), Height(height)
 {
-	glGenFramebuffers(1, &IdGBuffer);
-	glBindFramebuffer(GL_FRAMEBUFFER, IdGBuffer);
-
-	GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
-
-	if (status != GL_FRAMEBUFFER_COMPLETE) {
-		LOG_GL_ERROR("[OpenGL Error] (" + std::to_string(status) + ")");
-	}
-
-	GLCall(glBindFramebuffer(GL_FRAMEBUFFER, 0));
+	GLCall(glGenFramebuffers(1, &IdGBuffer));
+	GLCall(glBindFramebuffer(GL_FRAMEBUFFER, IdGBuffer));
 }
 
 void OpenGL::Advanced::GBuffer_OpenGL::Bind() const
@@ -103,6 +95,12 @@ unsigned int OpenGL::Advanced::GBuffer_OpenGL::AddRenderTarget(const std::string
 
 	GLCall(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + static_cast<unsigned int>(Targets.size() - 1), GL_TEXTURE_2D, Targets.back().second, 0));
 
+	std::vector<unsigned int> attachments{};
+	for (int i = 0; i < Targets.size(); i++)
+		attachments.push_back(GL_COLOR_ATTACHMENT0 + i);
+
+	GLCall(glDrawBuffers(Targets.size(), attachments.data()));
+
 	return Targets.back().second;
 }
 
@@ -158,7 +156,7 @@ bool OpenGL::Advanced::GBuffer_OpenGL::Validate()
 	GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
 
 	if (status != GL_FRAMEBUFFER_COMPLETE) {
-		std::cout << "[OpenGL Error] (" << std::to_string(status) << ")" << std::endl;
+		LOG_GL_ERROR("Could not validate gbuffer.");
 		return false;
 	}
 
