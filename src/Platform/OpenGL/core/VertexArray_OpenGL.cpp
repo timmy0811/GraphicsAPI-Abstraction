@@ -28,7 +28,7 @@ void OpenGL::Core::VertexArray_OpenGL::AddBuffer(const API::Core::VertexBuffer& 
 #pragma warning(disable:4312)
 		GLCall(glVertexAttribPointer(i, element.components, API::Core::VertexBufferElement::GetAPIDataType(element.type), element.normalized, layout.GetStride(), (const void*)offset));
 #pragma warning(pop)
-		offset += element.components * API::Core::VertexBufferLayout::ShaderDataTypeSize(element.type);
+		offset += API::Core::VertexBufferLayout::ShaderDataTypeSize(element.type);
 	}
 }
 

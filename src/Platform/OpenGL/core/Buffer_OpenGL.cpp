@@ -1,27 +1,32 @@
 #include "glpch.h"
 #include "Buffer_OpenGL.h"
 
-OpenGL::Core::Buffer_OpenGL::Buffer_OpenGL(BufferType type, const void* data, unsigned int size)
+OpenGL::Core::Buffer_OpenGL::Buffer_OpenGL(BufferType type, MemoryLayout layout, const void* data, unsigned int size)
 {
 	this->type = mapBufferType(type);
 	GLCall(glGenBuffers(1, &m_RendererID));
 	GLCall(glBindBuffer(this->type, m_RendererID));
-	GLCall(glBufferData(this->type, size, data, GL_STATIC_DRAW));
+	GLCall(glBufferData(this->type, size, data, mapMemoryLayout(layout)));
 
 	m_BufferSize = (size_t)size;
 }
 
-OpenGL::Core::Buffer_OpenGL::Buffer_OpenGL(BufferType type, unsigned int count, size_t elementSize)
+OpenGL::Core::Buffer_OpenGL::Buffer_OpenGL(BufferType type, MemoryLayout layout, unsigned int count, size_t elementSize)
 {
 	this->type = mapBufferType(type);
 	GLCall(glGenBuffers(1, &m_RendererID));
 	GLCall(glBindBuffer(this->type, m_RendererID));
-	GLCall(glBufferData(this->type, (size_t)count * elementSize, nullptr, GL_DYNAMIC_DRAW));
+	GLCall(glBufferData(this->type, (size_t)count * elementSize, nullptr, mapMemoryLayout(layout)));
 
 	m_BufferSize = (size_t)count * elementSize;
 }
 
 size_t OpenGL::Core::Buffer_OpenGL::AddData(const void* data, int size, int offset) {
+	if (offset + size > m_BufferSize) {
+		LOG_GL_ERROR("OpenGL Buffer exceeding its capacity by " + std::to_string(offset + size - m_BufferSize) + " Bytes. Adding of new data is canceled.");
+		return 0;
+	}
+
 	Bind();
 	GLCall(glBufferSubData(this->type, offset, size, data));
 
@@ -29,6 +34,11 @@ size_t OpenGL::Core::Buffer_OpenGL::AddData(const void* data, int size, int offs
 }
 
 size_t OpenGL::Core::Buffer_OpenGL::AddData(const void* data, int size) {
+	if (m_DataPtr + size > m_BufferSize) {
+		LOG_GL_ERROR("OpenGL Buffer exceeding its capacity by " + std::to_string(m_DataPtr + size - m_BufferSize) + " Bytes. Adding of new data is canceled.");
+		return 0;
+	}
+
 	Bind();
 	GLCall(glBufferSubData(this->type, m_DataPtr, size, data));
 	m_DataPtr += size;
@@ -72,7 +82,7 @@ void OpenGL::Core::Buffer_OpenGL::Unbind() const
 
 void OpenGL::Core::Buffer_OpenGL::BindBase(int slot) const
 {
-	GLCall(glBindBufferBase(this->type, 1, m_RendererID))
+	GLCall(glBindBufferBase(this->type, slot, m_RendererID))
 }
 
 GLenum OpenGL::Core::Buffer_OpenGL::mapBufferType(BufferType type)
@@ -91,6 +101,15 @@ GLenum OpenGL::Core::Buffer_OpenGL::mapBufferType(BufferType type)
 	case PIXEL_UNPACK_BUFFER: return GL_PIXEL_UNPACK_BUFFER;
 	case TRANSFORM_FEEDBACK_BUFFER: return GL_TRANSFORM_FEEDBACK_BUFFER;
 	case TEXTURE_BUFFER: return GL_TEXTURE_BUFFER;
+	default: return GL_NONE;
+	}
+}
+
+GLenum OpenGL::Core::Buffer_OpenGL::mapMemoryLayout(MemoryLayout layout)
+{
+	switch (layout) {
+	case STATIC: return GL_STATIC_DRAW;
+	case DYNAMIC: return GL_DYNAMIC_DRAW;
 	default: return GL_NONE;
 	}
 }

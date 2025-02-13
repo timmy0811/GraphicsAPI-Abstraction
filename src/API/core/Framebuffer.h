@@ -100,6 +100,8 @@ namespace API::Core {
 
 		virtual void Bind(unsigned int Framebuffer) = 0;
 
+		virtual int GetInternalId() const = 0;
+
 		virtual void Bind() const = 0;
 		virtual void BindAndClear() = 0;
 		virtual void Unbind() = 0;

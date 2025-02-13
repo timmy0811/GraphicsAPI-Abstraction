@@ -14,6 +14,8 @@ namespace OpenGL::Core {
 		Framebuffer_OpenGL(const glm::ivec2& size, bool attachDepth, API::Core::DepthBufferType depthType = API::Core::DepthBufferType::WRITE_ONLY);
 		Framebuffer_OpenGL(const glm::ivec2& size);
 
+		int GetInternalId() const override { return m_IdFBO; }
+
 		void Bind(unsigned int Framebuffer) override;
 
 		void Bind() const override;

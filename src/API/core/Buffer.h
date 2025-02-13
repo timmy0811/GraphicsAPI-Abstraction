@@ -19,6 +19,11 @@ namespace API::Core {
 			TEXTURE_BUFFER
 		};
 
+		enum MemoryLayout {
+			STATIC,
+			DYNAMIC
+		};
+
 		virtual ~Buffer() = default;
 
 		virtual size_t AddData(const void* data, int size, int offset) = 0;
@@ -34,10 +39,11 @@ namespace API::Core {
 
 		virtual void BindBase(int slot) const = 0;
 
-		virtual inline size_t getSize() const { return m_BufferSize; };
+		virtual inline size_t GetCapacity() const { return m_BufferSize; };
+		virtual inline size_t GetSize() const { return m_DataPtr; };
 
-		static Buffer* Create(BufferType type, const void* data, unsigned int size);
-		static Buffer* Create(BufferType type, unsigned int count, size_t elementSize);
+		static Buffer* Create(BufferType type, MemoryLayout layout, const void* data, unsigned int size);
+		static Buffer* Create(BufferType type, MemoryLayout layout, unsigned int count, size_t elementSize);
 
 	protected:
 		size_t m_DataPtr = 0;

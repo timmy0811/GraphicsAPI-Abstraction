@@ -9,8 +9,8 @@
 namespace OpenGL::Core {
 	class Buffer_OpenGL : public API::Core::Buffer {
 	public:
-		Buffer_OpenGL(BufferType type, const void* data, unsigned int size);
-		Buffer_OpenGL(BufferType type, unsigned int count, size_t elementSize);
+		Buffer_OpenGL(BufferType type, MemoryLayout layout, const void* data, unsigned int size);
+		Buffer_OpenGL(BufferType type, MemoryLayout layout, unsigned int count, size_t elementSize);
 		~Buffer_OpenGL() override;
 
 		size_t AddData(const void* data, int size, int offset) override;
@@ -28,6 +28,7 @@ namespace OpenGL::Core {
 
 	private:
 		GLenum mapBufferType(BufferType type);
+		GLenum mapMemoryLayout(MemoryLayout layout);
 
 	private:
 		GLenum type;

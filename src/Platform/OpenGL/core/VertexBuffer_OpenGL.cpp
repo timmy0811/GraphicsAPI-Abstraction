@@ -10,6 +10,7 @@ OpenGL::Core::VertexBuffer_OpenGL::VertexBuffer_OpenGL(const void* data, unsigne
 	GLCall(glBufferData(GL_ARRAY_BUFFER, size, data, GL_STATIC_DRAW));
 
 	m_BufferSize = (size_t)size;
+	m_DataPtr += size;
 }
 
 OpenGL::Core::VertexBuffer_OpenGL::VertexBuffer_OpenGL(unsigned int count, size_t elementSize)

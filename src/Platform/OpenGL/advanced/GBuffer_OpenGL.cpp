@@ -37,20 +37,26 @@ void OpenGL::Advanced::GBuffer_OpenGL::BindDepthTexture(unsigned int slot)
 void OpenGL::Advanced::GBuffer_OpenGL::BindTexture(unsigned int slot, unsigned int index)
 {
 	GLCall(glActiveTexture(GL_TEXTURE0 + slot));
-	GLCall(glBindTexture(GL_TEXTURE_2D, Targets[index].second));
+	GLCall(glBindTexture(GL_TEXTURE_2D, Targets[index].second.InternalId));
+	Targets[index].second.BoundSlot = slot;
+	Targets[index].second.IsBound = true;
 }
 
 void OpenGL::Advanced::GBuffer_OpenGL::BindTexture(const std::string& identifier, unsigned int index)
 {
 	GLCall(glActiveTexture(GL_TEXTURE0 + index));
 	GLCall(glBindTexture(GL_TEXTURE_2D, GetTargetInternalId(identifier)));
+	Targets[index].second.BoundSlot = index;
+	Targets[index].second.IsBound = true;
 }
 
 void OpenGL::Advanced::GBuffer_OpenGL::BindTextures(unsigned int startSlot)
 {
 	for (GLuint i = 0; i < Targets.size(); i++) {
 		GLCall(glActiveTexture(GL_TEXTURE0 + startSlot + i));
-		GLCall(glBindTexture(GL_TEXTURE_2D, Targets[i].second));
+		GLCall(glBindTexture(GL_TEXTURE_2D, Targets[i].second.InternalId));
+		Targets[i].second.BoundSlot = startSlot + i;
+		Targets[i].second.IsBound = true;
 	}
 }
 
@@ -58,7 +64,23 @@ unsigned int OpenGL::Advanced::GBuffer_OpenGL::GetTargetInternalId(const std::st
 {
 	for (const auto& target : Targets) {
 		if (target.first == identifier) {
-			return target.second;
+			return target.second.InternalId;
+		}
+	}
+
+	LOG_GL_WARN("Target not found: " + identifier + ". Returning 0");
+	return 0;
+}
+
+unsigned int OpenGL::Advanced::GBuffer_OpenGL::GetTargetBoundTextureSlot(const std::string& identifier)
+{
+	for (const auto& target : Targets) {
+		if (target.first == identifier) {
+			if (!target.second.IsBound) {
+				LOG_GL_WARN("Target not yet bound to a slot: " + identifier + ". Returning 0");
+				return 0;
+			}
+			return target.second.BoundSlot;
 		}
 	}
 
@@ -69,7 +91,7 @@ unsigned int OpenGL::Advanced::GBuffer_OpenGL::GetTargetInternalId(const std::st
 const std::string OpenGL::Advanced::GBuffer_OpenGL::GetTargetIdentifier(unsigned int internalId)
 {
 	for (const auto& target : Targets) {
-		if (target.second == internalId) {
+		if (target.second.InternalId == internalId) {
 			return target.first;
 		}
 	}
@@ -80,10 +102,10 @@ const std::string OpenGL::Advanced::GBuffer_OpenGL::GetTargetIdentifier(unsigned
 
 unsigned int OpenGL::Advanced::GBuffer_OpenGL::AddRenderTarget(const std::string& identifier, unsigned int width, unsigned int height, unsigned int components, API::Core::BufferDataType datatype, API::Core::WrapMethod wrap, void* data)
 {
-	Targets.push_back({ identifier, 0 });
+	Targets.push_back({ identifier, {0, 0} });
 
-	GLCall(glGenTextures(1, &Targets.back().second));
-	GLCall(glBindTexture(GL_TEXTURE_2D, Targets.back().second));
+	GLCall(glGenTextures(1, &Targets.back().second.InternalId));
+	GLCall(glBindTexture(GL_TEXTURE_2D, Targets.back().second.InternalId));
 
 	TextureFormat format = GetTextureFormat(components, datatype);
 	GLCall(glTexImage2D(GL_TEXTURE_2D, 0, format.InternalFormat, width, height, 0, format.Format, format.Type, data));
@@ -93,7 +115,7 @@ unsigned int OpenGL::Advanced::GBuffer_OpenGL::AddRenderTarget(const std::string
 	GLCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrap));
 	GLCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrap));
 
-	GLCall(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + static_cast<unsigned int>(Targets.size() - 1), GL_TEXTURE_2D, Targets.back().second, 0));
+	GLCall(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + static_cast<unsigned int>(Targets.size() - 1), GL_TEXTURE_2D, Targets.back().second.InternalId, 0));
 
 	std::vector<unsigned int> attachments{};
 	for (int i = 0; i < Targets.size(); i++)
@@ -101,7 +123,7 @@ unsigned int OpenGL::Advanced::GBuffer_OpenGL::AddRenderTarget(const std::string
 
 	GLCall(glDrawBuffers(Targets.size(), attachments.data()));
 
-	return Targets.back().second;
+	return Targets.back().second.InternalId;
 }
 
 unsigned int OpenGL::Advanced::GBuffer_OpenGL::AddRenderTarget(const std::string& identifier, unsigned int components, API::Core::BufferDataType datatype, API::Core::WrapMethod wrap, void* data)
@@ -148,6 +170,21 @@ unsigned int OpenGL::Advanced::GBuffer_OpenGL::AddDepthTarget(unsigned int width
 unsigned int OpenGL::Advanced::GBuffer_OpenGL::AddDepthTarget(API::Core::DepthBufferType type)
 {
 	return AddDepthTarget(Width, Height, type);
+}
+
+unsigned int OpenGL::Advanced::GBuffer_OpenGL::AddStencilTarget(unsigned int width, unsigned int height)
+{
+	glGenTextures(1, &StencilTarget);
+	glBindTexture(GL_TEXTURE_2D, StencilTarget);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH24_STENCIL8, width, height, 0, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8, NULL);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, StencilTarget, 0);
+
+	return StencilTarget;
+}
+
+unsigned int OpenGL::Advanced::GBuffer_OpenGL::AddStencilTarget()
+{
+	return AddStencilTarget(Width, Height);
 }
 
 bool OpenGL::Advanced::GBuffer_OpenGL::Validate()
