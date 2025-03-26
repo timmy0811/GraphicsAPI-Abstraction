@@ -11,6 +11,16 @@ OpenGL::Core::Buffer_OpenGL::Buffer_OpenGL(BufferType type, MemoryLayout layout,
 	m_BufferSize = (size_t)size;
 }
 
+OpenGL::Core::Buffer_OpenGL::Buffer_OpenGL(BufferType type, MemoryLayout layout, size_t capacity)
+{
+	this->type = mapBufferType(type);
+	GLCall(glGenBuffers(1, &m_RendererID));
+	GLCall(glBindBuffer(this->type, m_RendererID));
+	GLCall(glBufferData(this->type, capacity, nullptr, mapMemoryLayout(layout)));
+
+	m_BufferSize = capacity;
+}
+
 OpenGL::Core::Buffer_OpenGL::Buffer_OpenGL(BufferType type, MemoryLayout layout, unsigned int count, size_t elementSize)
 {
 	this->type = mapBufferType(type);
@@ -21,10 +31,10 @@ OpenGL::Core::Buffer_OpenGL::Buffer_OpenGL(BufferType type, MemoryLayout layout,
 	m_BufferSize = (size_t)count * elementSize;
 }
 
-size_t OpenGL::Core::Buffer_OpenGL::AddData(const void* data, int size, int offset) {
+int OpenGL::Core::Buffer_OpenGL::AddData(const void* data, size_t size, int offset) {
 	if (offset + size > m_BufferSize) {
 		LOG_GL_ERROR("OpenGL Buffer exceeding its capacity by " + std::to_string(offset + size - m_BufferSize) + " Bytes. Adding of new data is canceled.");
-		return 0;
+		return -1;
 	}
 
 	Bind();
@@ -33,26 +43,26 @@ size_t OpenGL::Core::Buffer_OpenGL::AddData(const void* data, int size, int offs
 	return offset;
 }
 
-size_t OpenGL::Core::Buffer_OpenGL::AddData(const void* data, int size) {
+int OpenGL::Core::Buffer_OpenGL::AddData(const void* data, size_t size) {
 	if (m_DataPtr + size > m_BufferSize) {
 		LOG_GL_ERROR("OpenGL Buffer exceeding its capacity by " + std::to_string(m_DataPtr + size - m_BufferSize) + " Bytes. Adding of new data is canceled.");
-		return 0;
+		return -1;
 	}
 
 	Bind();
 	GLCall(glBufferSubData(this->type, m_DataPtr, size, data));
 	m_DataPtr += size;
 
-	return m_DataPtr;
+	return (int)(m_DataPtr - size);
 }
 
-void OpenGL::Core::Buffer_OpenGL::SetData(const void* data, int size)
+void OpenGL::Core::Buffer_OpenGL::SetData(const void* data, size_t size)
 {
 	Bind();
 	GLCall(glBufferData(this->type, size, data, GL_STATIC_DRAW));
 }
 
-void OpenGL::Core::Buffer_OpenGL::SetDataDynamic(const void* data, int size)
+void OpenGL::Core::Buffer_OpenGL::SetDataDynamic(const void* data, size_t size)
 {
 	Bind();
 	GLCall(glBufferData(this->type, size, data, GL_DYNAMIC_DRAW));
@@ -82,7 +92,7 @@ void OpenGL::Core::Buffer_OpenGL::Unbind() const
 
 void OpenGL::Core::Buffer_OpenGL::BindBase(int slot) const
 {
-	GLCall(glBindBufferBase(this->type, slot, m_RendererID))
+	GLCall(glBindBufferBase(this->type, slot, m_RendererID));
 }
 
 GLenum OpenGL::Core::Buffer_OpenGL::mapBufferType(BufferType type)

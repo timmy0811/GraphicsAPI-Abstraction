@@ -13,6 +13,14 @@
 #define GLCall(x) x
 #endif
 
+#define GlCallOnDestruct(x) do { \
+    x; \
+    GLenum error = glGetError(); \
+    if (error != GL_NO_ERROR) { \
+        std::cerr << "[Termination] OpenGL Error: " << error << " in " << __FILE__ << ":" << __LINE__ << " - " << #x << std::endl; \
+    } \
+} while (0)
+
 #define LOG(message) std::cout << message << std::endl
 #define ASSERT(x) if(!(x)) __debugbreak();
 #define API_ASSERT(x, ...) {if(!(x)) { LOG_GL_ERROR("Assertion Failed: {0}", __VA_ARGS__); __debugbreak(); } }

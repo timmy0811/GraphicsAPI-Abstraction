@@ -5,6 +5,7 @@
 #include "API/core/VertexArray.h"
 #include "API/core/VertexBuffer.h"
 #include "API/core/VertexBufferLayout.h"
+#include "API/core/Buffer.h"
 
 namespace OpenGL::Core {
 	class VertexArray_OpenGL : public API::Core::VertexArray
@@ -14,10 +15,13 @@ namespace OpenGL::Core {
 		~VertexArray_OpenGL() override;
 
 		void AddBuffer(const API::Core::VertexBuffer& vb, const API::Core::VertexBufferLayout& layout) override;
+		void AddBuffer(const API::Core::Buffer& vb, const API::Core::VertexBufferLayout& layout) override;
 		void Bind() const override;
 		void Unbind() const override;
 
 	private:
-		unsigned int m_RendererID;
+		void AddBuffer(const API::Core::VertexBufferLayout& layout);
+	private:
+		unsigned int m_RendererID = 0;
 	};
 }

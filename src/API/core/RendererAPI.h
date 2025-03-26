@@ -3,6 +3,7 @@
 #include <vendor/glm/glm.hpp>
 
 #include "VertexArray.h"
+#include "Buffer.h"
 #include "IndexBuffer.h"
 #include "PropertyEnums.h"
 
@@ -40,6 +41,7 @@ namespace API::Core {
 
 		virtual void Draw(const std::shared_ptr<VertexArray>& vertexArray, size_t size) = 0;
 		virtual void DrawIndexed(const std::shared_ptr<VertexArray>& vertexArray, const std::shared_ptr<IndexBuffer>& indexBuffer) = 0;
+		virtual void DrawIndexed(const std::shared_ptr<VertexArray>& vertexArray, const std::shared_ptr<Buffer>& indexBuffer) = 0;
 
 		virtual void DrawInstanced(const std::shared_ptr<VertexArray>& vertexArray, size_t size, unsigned int instances) = 0;
 		virtual void DrawInstanced(const std::shared_ptr<VertexArray>& vertexArray, const std::shared_ptr<IndexBuffer>& indexBuffer, unsigned int instances) = 0;

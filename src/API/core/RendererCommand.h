@@ -36,6 +36,11 @@ namespace API::Core {
 			s_RendererAPI->DrawIndexed(vertexArray, indexBuffer);
 		}
 
+		inline static void DrawIndexed(const std::shared_ptr<VertexArray>& vertexArray, const std::shared_ptr<Buffer>& indexBuffer)
+		{
+			s_RendererAPI->DrawIndexed(vertexArray, indexBuffer);
+		}
+
 		inline static void DrawInstanced(const std::shared_ptr<VertexArray>& vertexArray, size_t size, unsigned int instances)
 		{
 			s_RendererAPI->DrawInstanced(vertexArray, size, instances);

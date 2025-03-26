@@ -5,14 +5,15 @@
 #include "API/core/VertexBuffer.h"
 
 namespace OpenGL::Core {
-	class VertexBuffer_OpenGL : public API::Core::VertexBuffer{
+	class VertexBuffer_OpenGL : public API::Core::VertexBuffer {
 	public:
 		VertexBuffer_OpenGL(const void* data, unsigned int size);
 		VertexBuffer_OpenGL(unsigned int count, size_t elementSize);
+		VertexBuffer_OpenGL(size_t capacity);
 		~VertexBuffer_OpenGL() override;
 
-		void AddVertexData(const void* data, int size, int offset) override;
-		void AddVertexData(const void* data, int size) override;
+		int AddVertexData(const void* data, int size, int offset) override;
+		int AddVertexData(const void* data, int size) override;
 
 		void Empty() override;
 

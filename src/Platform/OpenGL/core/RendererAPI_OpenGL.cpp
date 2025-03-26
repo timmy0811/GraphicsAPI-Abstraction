@@ -35,6 +35,11 @@ void OpenGL::Core::RendererAPI_OpenGL::DrawIndexed(const std::shared_ptr<API::Co
 	GLCall(glDrawElements(GL_TRIANGLES, indexBuffer->GetCount(), GL_UNSIGNED_INT, nullptr));
 }
 
+void OpenGL::Core::RendererAPI_OpenGL::DrawIndexed(const std::shared_ptr<API::Core::VertexArray>& vertexArray, const std::shared_ptr<API::Core::Buffer>& indexBuffer)
+{
+	GLCall(glDrawElements(GL_TRIANGLES, indexBuffer->GetSize() / sizeof(unsigned int), GL_UNSIGNED_INT, nullptr));
+}
+
 void OpenGL::Core::RendererAPI_OpenGL::DrawInstanced(const std::shared_ptr<API::Core::VertexArray>& vertexArray, size_t size, unsigned int instances)
 {
 	vertexArray->Bind();

@@ -18,6 +18,28 @@ void OpenGL::Core::VertexArray_OpenGL::AddBuffer(const API::Core::VertexBuffer& 
 {
 	Bind();
 	vb.Bind();
+	AddBuffer(layout);
+}
+
+void OpenGL::Core::VertexArray_OpenGL::AddBuffer(const API::Core::Buffer& vb, const API::Core::VertexBufferLayout& layout)
+{
+	Bind();
+	vb.Bind();
+	AddBuffer(layout);
+}
+
+void OpenGL::Core::VertexArray_OpenGL::Bind() const
+{
+	GLCall(glBindVertexArray(m_RendererID));
+}
+
+void OpenGL::Core::VertexArray_OpenGL::Unbind() const
+{
+	GLCall(glBindVertexArray(0));
+}
+
+void OpenGL::Core::VertexArray_OpenGL::AddBuffer(const API::Core::VertexBufferLayout& layout)
+{
 	const auto& elements = layout.GetElements();
 	unsigned int offset = 0;
 
@@ -30,14 +52,4 @@ void OpenGL::Core::VertexArray_OpenGL::AddBuffer(const API::Core::VertexBuffer& 
 #pragma warning(pop)
 		offset += API::Core::VertexBufferLayout::ShaderDataTypeSize(element.type);
 	}
-}
-
-void OpenGL::Core::VertexArray_OpenGL::Bind() const
-{
-	GLCall(glBindVertexArray(m_RendererID));
-}
-
-void OpenGL::Core::VertexArray_OpenGL::Unbind() const
-{
-	GLCall(glBindVertexArray(0));
 }

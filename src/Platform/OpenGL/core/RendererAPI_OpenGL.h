@@ -13,6 +13,7 @@ namespace OpenGL::Core {
 
 		virtual void Draw(const std::shared_ptr<API::Core::VertexArray>& vertexArray, size_t size) override;
 		virtual void DrawIndexed(const std::shared_ptr<API::Core::VertexArray>& vertexArray, const std::shared_ptr<API::Core::IndexBuffer>& ib) override;
+		virtual void DrawIndexed(const std::shared_ptr<API::Core::VertexArray>& vertexArray, const std::shared_ptr<API::Core::Buffer>& ib) override;
 
 		virtual void DrawInstanced(const std::shared_ptr<API::Core::VertexArray>& vertexArray, size_t size, unsigned int instances) override;
 		virtual void DrawInstanced(const std::shared_ptr<API::Core::VertexArray>& vertexArray, const std::shared_ptr<API::Core::IndexBuffer>& indexBuffer, unsigned int instances) override;

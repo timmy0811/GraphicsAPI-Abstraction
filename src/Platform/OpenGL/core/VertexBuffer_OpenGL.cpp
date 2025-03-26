@@ -22,15 +22,28 @@ OpenGL::Core::VertexBuffer_OpenGL::VertexBuffer_OpenGL(unsigned int count, size_
 	m_BufferSize = (size_t)count * elementSize;
 }
 
-void OpenGL::Core::VertexBuffer_OpenGL::AddVertexData(const void* data, int size, int offset) {
-	Bind();
-	GLCall(glBufferSubData(GL_ARRAY_BUFFER, offset, size, data));
+OpenGL::Core::VertexBuffer_OpenGL::VertexBuffer_OpenGL(size_t capacity)
+{
+	GLCall(glGenBuffers(1, &m_RendererID));
+	GLCall(glBindBuffer(GL_ARRAY_BUFFER, m_RendererID));
+	GLCall(glBufferData(GL_ARRAY_BUFFER, capacity, nullptr, GL_DYNAMIC_DRAW));
+
+	m_BufferSize = capacity;
 }
 
-void OpenGL::Core::VertexBuffer_OpenGL::AddVertexData(const void* data, int size) {
+int OpenGL::Core::VertexBuffer_OpenGL::AddVertexData(const void* data, int size, int offset) {
+	Bind();
+	GLCall(glBufferSubData(GL_ARRAY_BUFFER, offset, size, data));
+
+	return offset;
+}
+
+int OpenGL::Core::VertexBuffer_OpenGL::AddVertexData(const void* data, int size) {
 	Bind();
 	GLCall(glBufferSubData(GL_ARRAY_BUFFER, m_DataPtr, size, data));
 	m_DataPtr += size;
+
+	return m_DataPtr - size;
 }
 
 void OpenGL::Core::VertexBuffer_OpenGL::Empty()

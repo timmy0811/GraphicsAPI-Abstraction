@@ -10,14 +10,15 @@ namespace OpenGL::Core {
 	class Buffer_OpenGL : public API::Core::Buffer {
 	public:
 		Buffer_OpenGL(BufferType type, MemoryLayout layout, const void* data, unsigned int size);
+		Buffer_OpenGL(BufferType type, MemoryLayout layout, size_t capacity);
 		Buffer_OpenGL(BufferType type, MemoryLayout layout, unsigned int count, size_t elementSize);
 		~Buffer_OpenGL() override;
 
-		size_t AddData(const void* data, int size, int offset) override;
-		size_t AddData(const void* data, int size) override;
+		int AddData(const void* data, size_t size, int offset) override;
+		int AddData(const void* data, size_t size) override;
 
-		void SetData(const void* data, int size) override;
-		void SetDataDynamic(const void* data, int size) override;
+		void SetData(const void* data, size_t size) override;
+		void SetDataDynamic(const void* data, size_t size) override;
 
 		void Empty() override;
 

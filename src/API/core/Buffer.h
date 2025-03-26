@@ -26,11 +26,11 @@ namespace API::Core {
 
 		virtual ~Buffer() = default;
 
-		virtual size_t AddData(const void* data, int size, int offset) = 0;
-		virtual size_t AddData(const void* data, int size) = 0;
+		virtual int AddData(const void* data, size_t size, int offset) = 0;
+		virtual int AddData(const void* data, size_t size) = 0;
 
-		virtual void SetData(const void* data, int size) = 0;
-		virtual void SetDataDynamic(const void* data, int size) = 0;
+		virtual void SetData(const void* data, size_t size) = 0;
+		virtual void SetDataDynamic(const void* data, size_t size) = 0;
 
 		virtual void Empty() = 0;
 
@@ -43,6 +43,7 @@ namespace API::Core {
 		virtual inline size_t GetSize() const { return m_DataPtr; };
 
 		static Buffer* Create(BufferType type, MemoryLayout layout, const void* data, unsigned int size);
+		static Buffer* Create(BufferType type, MemoryLayout layout, size_t capacity);
 		static Buffer* Create(BufferType type, MemoryLayout layout, unsigned int count, size_t elementSize);
 
 	protected:

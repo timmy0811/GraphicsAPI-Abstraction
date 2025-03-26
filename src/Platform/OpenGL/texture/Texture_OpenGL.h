@@ -10,6 +10,9 @@ namespace OpenGL::Texture {
 		Texture_OpenGL(const std::string& path, const bool flipUV);
 		~Texture_OpenGL();
 
+		uint64_t MakeResident() override;
+		uint64_t GenerateHandle() override;
+
 		int Bind(const unsigned int slot = 0) override;
 		void Unbind() override;
 	};
