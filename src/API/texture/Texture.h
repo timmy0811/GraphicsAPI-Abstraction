@@ -5,6 +5,7 @@
 
 namespace API::Texture {
 	enum class TextureType { DIFFUSE, SPECULAR, SHINE, NORMAL, HEIGHT, DEFAULT };
+	enum class TextureFilter { NEAREST, LINEAR, MIPMAP_NEAREST, MIPMAP_LINEAR, NEAREST_MIPMAP_NEAREST, NEAREST_MIPMAP_LINEAR, LINEAR_MIPMAP_NEAREST, LINEAR_MIPMAP_LINEAR };
 
 	class Texture
 	{
@@ -28,7 +29,7 @@ namespace API::Texture {
 		inline TextureType GetType() const { return m_Type; };
 		inline const bool GetError() const { return Error; };
 
-		static Texture* Create(const std::string& path, const bool flipUV = false);
+		static Texture* Create(const std::string& path, TextureFilter filter = TextureFilter::LINEAR, const bool flipUV = false);
 
 		static std::string TextureTypeToString(TextureType type) {
 			switch (type) {

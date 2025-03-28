@@ -6,7 +6,7 @@
 #include <GL/glew.h>
 #include <iostream>
 
-OpenGL::Texture::Texture_OpenGL::Texture_OpenGL(const std::string& path, const bool flipUV)
+OpenGL::Texture::Texture_OpenGL::Texture_OpenGL(const std::string& path, API::Texture::TextureFilter filter, const bool flipUV)
 {
 	m_Filepath = path;
 	m_LocalBuffer = nullptr;
@@ -26,10 +26,10 @@ OpenGL::Texture::Texture_OpenGL::Texture_OpenGL(const std::string& path, const b
 	GLCall(glBindTexture(GL_TEXTURE_2D, m_RendererID));
 
 	{
-		constexpr int filter = GL_NEAREST; // GL_LINEAR
+		const int glFilter = MapGLFilter(filter);
 
-		GLCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filter));
-		GLCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filter));
+		GLCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, glFilter));
+		GLCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, glFilter));
 	}
 
 	GLCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE));
@@ -82,4 +82,22 @@ void OpenGL::Texture::Texture_OpenGL::Unbind()
 	GLCall(glActiveTexture(m_BoundID));
 	GLCall(glBindTexture(GL_TEXTURE_2D, 0));
 	m_BoundID = -1;
+}
+
+int OpenGL::Texture::Texture_OpenGL::MapGLFilter(API::Texture::TextureFilter filter)
+{
+	switch (filter)
+	{
+	case API::Texture::TextureFilter::NEAREST: return GL_NEAREST;
+	case API::Texture::TextureFilter::LINEAR: return GL_LINEAR;
+	case API::Texture::TextureFilter::MIPMAP_NEAREST: return GL_NEAREST_MIPMAP_NEAREST;
+	case API::Texture::TextureFilter::MIPMAP_LINEAR: return GL_LINEAR_MIPMAP_LINEAR;
+	case API::Texture::TextureFilter::NEAREST_MIPMAP_NEAREST: return GL_NEAREST_MIPMAP_NEAREST;
+	case API::Texture::TextureFilter::NEAREST_MIPMAP_LINEAR: return GL_NEAREST_MIPMAP_LINEAR;
+	case API::Texture::TextureFilter::LINEAR_MIPMAP_NEAREST: return GL_LINEAR_MIPMAP_NEAREST;
+	case API::Texture::TextureFilter::LINEAR_MIPMAP_LINEAR: return GL_LINEAR_MIPMAP_LINEAR;
+	}
+
+	LOG_GL_WARN("Unknown filter type: {}. Falling back to: linear filtering.", (int)filter);
+	return GL_LINEAR;
 }

@@ -115,7 +115,7 @@ std::vector<API::Texture::Texture*> API::Model::Model3D::LoadMaterialTextures(ai
 		}
 
 		if (!skip) {
-			Texture::Texture* texture = Texture::Texture::Create(path, false); // m_Directory + str ???
+			Texture::Texture* texture = Texture::Texture::Create(path, API::Texture::TextureFilter::LINEAR, false); // m_Directory + str ???
 
 			switch (type) {
 			case aiTextureType_DIFFUSE: {

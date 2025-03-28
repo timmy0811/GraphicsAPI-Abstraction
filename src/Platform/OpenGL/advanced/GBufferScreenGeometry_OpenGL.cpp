@@ -14,20 +14,22 @@ OpenGL::Advanced::GBufferScreenGeometry_OpenGL::GBufferScreenGeometry_OpenGL(uns
 	};
 
 	IBO.reset(API::Core::IndexBuffer::Create(index, 6));
-	VBO.reset(API::Core::VertexBuffer::Create(4, sizeof(float) * 3));
+	VBO.reset(API::Core::VertexBuffer::Create(4, sizeof(float) * 5));
 
 	float vert[] = {
-		-1.f, -1.f, 0.f,
-		1.f, -1.f, 0.f,
-		1.f, 1.f, 0.f,
-		-1.f, 1.f, 0.f
+		// Positions        // UVs
+		-1.f, -1.f, 0.f,     0.f, 0.f,  // Bottom-left
+		 1.f, -1.f, 0.f,     1.f, 0.f,  // Bottom-right
+		 1.f,  1.f, 0.f,     1.f, 1.f,  // Top-right
+		-1.f,  1.f, 0.f,     0.f, 1.f   // Top-left
 	};
 
 	VBO->Bind();
-	VBO->AddVertexData(vert, sizeof(float) * 3 * 4);
+	VBO->AddVertexData(vert, sizeof(float) * 5 * 4);
 
 	VBL.reset(API::Core::VertexBufferLayout::Create());
 	VBL->Push(API::Core::ShaderDataType::Float3);
+	VBL->Push(API::Core::ShaderDataType::Float2);
 
 	VAO.reset(API::Core::VertexArray::Create());
 	VAO->AddBuffer(*VBO, *VBL);
