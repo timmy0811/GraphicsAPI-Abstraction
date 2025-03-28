@@ -34,3 +34,8 @@ target_link_libraries(GLWrapper PUBLIC spdlog)
 # target_link_libraries(GLWrapper PUBLIC glm)
 
 target_include_directories(GLWrapper PUBLIC ${CMAKE_SOURCE_DIR}/dependencies/glew/include)
+
+target_compile_definitions(GLWrapper PRIVATE
+    $<$<CONFIG:Debug>:DEBUG>
+    $<$<CONFIG:Release>:RELEASE>
+)

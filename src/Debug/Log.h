@@ -8,6 +8,8 @@ namespace API {
 	class LogAPI
 	{
 	public:
+		// Overloaded Init method that accepts a shared sink pointer.
+		static void Init(const std::shared_ptr<spdlog::sinks::sink>& sharedSink);
 		static void Init();
 
 		inline static std::shared_ptr<spdlog::logger> GetCoreLogger() { return s_CoreLogger; }
@@ -25,8 +27,8 @@ namespace API {
 
 #define LOG_GL_FATAL(...) ::API::LogAPI::GetCoreLogger()->fatal(__VA_ARGS__)
 #define LOG_GL_ERROR(...) ::API::LogAPI::GetCoreLogger()->error(__VA_ARGS__)
-#define LOG_GL_WARN(...) ::API::LogAPI::GetCoreLogger()->warn(__VA_ARGS__)
-#define LOG_GL_INFO(...) ::API::LogAPI::GetCoreLogger()->info(__VA_ARGS__)
+#define LOG_GL_WARN(...)  ::API::LogAPI::GetCoreLogger()->warn(__VA_ARGS__)
+#define LOG_GL_INFO(...)  ::API::LogAPI::GetCoreLogger()->info(__VA_ARGS__)
 #define LOG_GL_TRACE(...) ::API::LogAPI::GetCoreLogger()->trace(__VA_ARGS__)
 
 #define LOG_GL_START_LOCAL_SW(name) spdlog::stopwatch name
