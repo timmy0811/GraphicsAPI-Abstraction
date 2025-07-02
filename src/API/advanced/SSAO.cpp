@@ -6,7 +6,7 @@
 
 #include <random>
 
-API::Advanced::SSAO::SSAO()
+API::Advanced::SSAO::SSAO(): m_IdNoise(0)
 {
 	m_Kernel.reserve(64);
 }
@@ -17,10 +17,11 @@ void API::Advanced::SSAO::GenerateSampleKernel(int samples)
 	std::default_random_engine generator;
 	for (unsigned int i = 0; i < 64; ++i)
 	{
-		glm::vec3 sample(randomFloats(generator) * 2.0 - 1.0, randomFloats(generator) * 2.0 - 1.0, randomFloats(generator));
+		glm::vec3 sample(randomFloats(generator) * 2.0 - 1.0, randomFloats(generator) * 2.0 - 1.0,
+		                 randomFloats(generator));
 		sample = glm::normalize(sample);
 		sample *= randomFloats(generator);
-		float scale = float(i) / 64.0f;
+		float scale = static_cast<float>(i) / 64.0f;
 
 		scale = 0.1f + scale * scale * 0.9f;
 		sample *= scale;
@@ -30,10 +31,11 @@ void API::Advanced::SSAO::GenerateSampleKernel(int samples)
 
 inline API::Advanced::SSAO* API::Advanced::SSAO::Create()
 {
-	switch (API::Core::DefaultRendererContext::GetAPI())
+	switch (Core::DefaultRendererContext::GetAPI())
 	{
-	case API::Core::RendererAPI::API_ENUM::None:    API_ASSERT(false, "RendererAPI::None is currently not supported!"); return nullptr;
-	case API::Core::RendererAPI::API_ENUM::OpenGL:  return new OpenGL::Advanced::SSAO_OpenGL();
+	case Core::RendererAPI::API_ENUM::None: API_ASSERT(false, "RendererAPI::None is currently not supported!");
+		return nullptr;
+	case Core::RendererAPI::API_ENUM::OpenGL: return new OpenGL::Advanced::SSAO_OpenGL();
 	}
 
 	API_ASSERT(false, "Unknown RendererAPI!");

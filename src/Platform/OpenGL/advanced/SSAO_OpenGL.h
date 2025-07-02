@@ -5,14 +5,14 @@
 
 #include <vector>
 
-namespace OpenGL::Advanced {
-	class SSAO_OpenGL : public API::Advanced::SSAO
+namespace OpenGL::Advanced
+{
+	class SSAO_OpenGL final : public API::Advanced::SSAO
 	{
 	public:
-		SSAO_OpenGL() 
-			:API::Advanced::SSAO() {}
+		SSAO_OpenGL() = default;
 
 		void GenerateSSAONoiseMap() override;
-		void BindNoiseTex(const unsigned int slot) override;
+		void BindNoiseTex(unsigned int slot) override;
 	};
 }

@@ -5,7 +5,7 @@
 
 #include <GL/glew.h>
 
-OpenGL::Core::IndexBuffer_OpenGL::IndexBuffer_OpenGL(const unsigned int* data, unsigned int count)
+OpenGL::Core::IndexBuffer_OpenGL::IndexBuffer_OpenGL(const unsigned int* data, const unsigned int count)
 {
 	m_Count = count;
 	API_ASSERT(sizeof(unsigned int) == sizeof(GLuint), "Mismatch in OpenGL datatype size!");

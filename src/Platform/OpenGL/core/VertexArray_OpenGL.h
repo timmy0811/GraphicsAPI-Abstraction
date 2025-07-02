@@ -8,7 +8,7 @@
 #include "API/core/Buffer.h"
 
 namespace OpenGL::Core {
-	class VertexArray_OpenGL : public API::Core::VertexArray
+	class VertexArray_OpenGL final : public API::Core::VertexArray
 	{
 	public:
 		VertexArray_OpenGL();
@@ -20,7 +20,7 @@ namespace OpenGL::Core {
 		void Unbind() const override;
 
 	private:
-		void AddBuffer(const API::Core::VertexBufferLayout& layout);
+		static void AddBuffer(const API::Core::VertexBufferLayout& layout);
 	private:
 		unsigned int m_RendererID = 0;
 	};

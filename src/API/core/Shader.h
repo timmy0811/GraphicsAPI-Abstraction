@@ -6,21 +6,24 @@
 #include "Misc/structs/Material.hpp"
 #include "Misc/structs/Light.hpp"
 
-namespace API::Core {
-
+namespace API::Core
+{
 	// Inherit this class to create own implementations for custom structures
 
 	class Shader
 	{
 	public:
-		struct ShaderProgramSource {
+		struct ShaderProgramSource
+		{
 			std::string VertexSource;
 			std::string FragmentSource;
 		};
 
 	public:
 		Shader(const std::string& path_vert, const std::string& path_frag)
-			:m_PathVert(path_vert), m_PathFrag(path_frag) {}
+			: m_PathVert(path_vert), m_PathFrag(path_frag)
+		{
+		}
 
 		virtual ~Shader() = default;
 
@@ -56,7 +59,6 @@ namespace API::Core {
 		virtual void SetUniformDirectionalLight(const std::string& name, light::DirectionalLight& m, unsigned int index) = 0;
 
 		virtual void SetUniformMat4f(const std::string& name, const glm::mat4& mat) = 0;
-		// ----------------
 
 		static Shader* Create(const std::string& path_vert, const std::string& path_frag);
 

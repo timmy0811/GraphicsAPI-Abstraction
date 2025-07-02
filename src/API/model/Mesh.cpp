@@ -1,26 +1,24 @@
 #include "glpch.h"
 #include "Mesh.h"
 
-API::Model::Mesh::Mesh(std::vector<primitive::vertex::VertexMesh> vertices, std::vector<unsigned int> indices, std::vector<Texture::Texture*> textures)
-	:m_Vertices(vertices), m_Indices(indices), textures(textures)
+API::Model::Mesh::Mesh(const std::vector<primitive::vertex::VertexMesh>& vertices, const std::vector<unsigned int>& indices, const std::vector<Texture::Texture*>& textures)
+	: m_Vertices(vertices), m_Indices(indices), textures(textures)
 {
-	// Load members
 	m_IB.reset(Core::IndexBuffer::Create(&m_Indices[0], (unsigned int)m_Indices.size()));
 
-	// Basic Setup
 	m_VB.reset(Core::VertexBuffer::Create(&m_Vertices[0], (unsigned int)(sizeof(primitive::vertex::VertexMesh) * m_Vertices.size())));
 	m_VBLayout.reset(Core::VertexBufferLayout::Create());
 
-	m_VBLayout->Push(API::Core::ShaderDataType::Float3); // Position
-	m_VBLayout->Push(API::Core::ShaderDataType::Float2); // TexCoord
-	m_VBLayout->Push(API::Core::ShaderDataType::Float3); // Normal
-	m_VBLayout->Push(API::Core::ShaderDataType::Float);  // Texture Index
+	m_VBLayout->Push(Core::ShaderDataType::Float3); // Position
+	m_VBLayout->Push(Core::ShaderDataType::Float2); // TexCoord
+	m_VBLayout->Push(Core::ShaderDataType::Float3); // Normal
+	m_VBLayout->Push(Core::ShaderDataType::Float); // Texture Index
 
 	m_VA.reset(Core::VertexArray::Create());
 	m_VA->AddBuffer(*m_VB, *m_VBLayout);
 }
 
-void API::Model::Mesh::LoadTextures(Core::Shader& shader)
+void API::Model::Mesh::LoadTextures(Core::Shader& shader) const
 {
 	unsigned int diffuseInd = 0;
 	unsigned int specularInd = 0;
@@ -49,10 +47,12 @@ void API::Model::Mesh::LoadTextures(Core::Shader& shader)
 
 	shader.Bind();
 
-	for (Texture::Texture* tex : textures) {
+	for (Texture::Texture* tex : textures)
+	{
 		tex->Bind(bindOffset++);
 
-		switch (tex->GetType()) {
+		switch (tex->GetType())
+		{
 		case Texture::TextureType::DIFFUSE:
 			samplerDiffuse[diffuseInd++] = tex->GetBoundPort();
 			break;
@@ -68,6 +68,8 @@ void API::Model::Mesh::LoadTextures(Core::Shader& shader)
 		case Texture::TextureType::HEIGHT:
 			samplerHeight[heightInd++] = tex->GetBoundPort();
 			break;
+		case Texture::TextureType::DEFAULT:
+			break;
 		}
 	}
 
@@ -78,7 +80,7 @@ void API::Model::Mesh::LoadTextures(Core::Shader& shader)
 	shader.SetUniform1iv("u_samplerHeight", MAX_TEXTURE_SLOTS, samplerHeight);
 }
 
-void API::Model::Mesh::Draw(Core::Shader& shader)
+void API::Model::Mesh::Draw(Core::Shader& shader) const
 {
 	LoadTextures(shader);
 

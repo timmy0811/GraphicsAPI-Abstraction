@@ -3,7 +3,9 @@
 
 #include <GL/glew.h>
 
-OpenGL::Core::VertexBuffer_OpenGL::VertexBuffer_OpenGL(const void* data, unsigned int size)
+#include "Debug/Debug.h"
+
+OpenGL::Core::VertexBuffer_OpenGL::VertexBuffer_OpenGL(const void* data, const unsigned int size)
 {
 	GLCall(glGenBuffers(1, &m_RendererID));
 	GLCall(glBindBuffer(GL_ARRAY_BUFFER, m_RendererID));
@@ -13,7 +15,7 @@ OpenGL::Core::VertexBuffer_OpenGL::VertexBuffer_OpenGL(const void* data, unsigne
 	m_DataPtr += size;
 }
 
-OpenGL::Core::VertexBuffer_OpenGL::VertexBuffer_OpenGL(unsigned int count, size_t elementSize)
+OpenGL::Core::VertexBuffer_OpenGL::VertexBuffer_OpenGL(const unsigned int count, const size_t elementSize)
 {
 	GLCall(glGenBuffers(1, &m_RendererID));
 	GLCall(glBindBuffer(GL_ARRAY_BUFFER, m_RendererID));
@@ -22,7 +24,7 @@ OpenGL::Core::VertexBuffer_OpenGL::VertexBuffer_OpenGL(unsigned int count, size_
 	m_BufferSize = (size_t)count * elementSize;
 }
 
-OpenGL::Core::VertexBuffer_OpenGL::VertexBuffer_OpenGL(size_t capacity)
+OpenGL::Core::VertexBuffer_OpenGL::VertexBuffer_OpenGL(const size_t capacity)
 {
 	GLCall(glGenBuffers(1, &m_RendererID));
 	GLCall(glBindBuffer(GL_ARRAY_BUFFER, m_RendererID));
@@ -31,19 +33,21 @@ OpenGL::Core::VertexBuffer_OpenGL::VertexBuffer_OpenGL(size_t capacity)
 	m_BufferSize = capacity;
 }
 
-int OpenGL::Core::VertexBuffer_OpenGL::AddVertexData(const void* data, int size, int offset) {
+int OpenGL::Core::VertexBuffer_OpenGL::AddVertexData(const void* data, const int size, const int offset)
+{
 	Bind();
 	GLCall(glBufferSubData(GL_ARRAY_BUFFER, offset, size, data));
 
 	return offset;
 }
 
-int OpenGL::Core::VertexBuffer_OpenGL::AddVertexData(const void* data, int size) {
+int OpenGL::Core::VertexBuffer_OpenGL::AddVertexData(const void* data, const int size)
+{
 	Bind();
 	GLCall(glBufferSubData(GL_ARRAY_BUFFER, m_DataPtr, size, data));
 	m_DataPtr += size;
 
-	return m_DataPtr - size;
+	return (int)m_DataPtr - size;
 }
 
 void OpenGL::Core::VertexBuffer_OpenGL::Empty()

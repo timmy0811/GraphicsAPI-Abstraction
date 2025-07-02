@@ -20,21 +20,27 @@
 #include <map>
 #include <string>
 
-namespace API::Misc {
-	class FontRendererLegacy {
+namespace API::Misc
+{
+	class FontRendererLegacy
+	{
 	public:
-		explicit FontRendererLegacy(const std::string& imgPath, const std::string& fontPath, int capacity, glm::vec2 winSize, const bool unicode = false, unsigned int sheetId = 0)
-			:fontSheet(Texture::Texture::Create(imgPath, true)), shader(Core::Shader::Create("res/shaders/font/shader_font_stylized.vert", "res/shaders/font/shader_font_stylized.frag"))
+		explicit FontRendererLegacy(const std::string& imgPath, const std::string& fontPath, int capacity,
+		                            glm::vec2 winSize, const bool unicode = false, unsigned int sheetId = 0)
+			: fontSheet(Texture::Texture::Create(imgPath, Texture::TextureFilter::LINEAR, true)),
+			  shader(Core::Shader::Create("res/shaders/font/shader_font_stylized.vert",
+			                              "res/shaders/font/shader_font_stylized.frag"))
 		{
 			projection = glm::ortho(0.0f, winSize.x, 0.0f, winSize.y, -1.0f, 1.0f);
 			translation = glm::vec3(0.f, 0.f, 0.f);
 			view = glm::translate(glm::mat4(1.f), glm::vec3(0.f, 0.f, 0.f));
 			this->unicode = unicode;
 
-			unsigned int* indices = new unsigned int[capacity * 6];
+			auto indices = new unsigned int[capacity * 6];
 
 			unsigned int offset = 0;
-			for (size_t i = 0; i < capacity * 6; i += 6) {
+			for (size_t i = 0; i < capacity * 6; i += 6)
+			{
 				indices[i + 0] = 0 + offset;
 				indices[i + 1] = 1 + offset;
 				indices[i + 2] = 2 + offset;
@@ -53,10 +59,10 @@ namespace API::Misc {
 
 			vbLayout.reset(Core::VertexBufferLayout::Create());
 
-			vbLayout->Push(API::Core::ShaderDataType::Float2);
-			vbLayout->Push(API::Core::ShaderDataType::Float2);
-			vbLayout->Push(API::Core::ShaderDataType::Float);
-			vbLayout->Push(API::Core::ShaderDataType::Float);
+			vbLayout->Push(Core::ShaderDataType::Float2);
+			vbLayout->Push(Core::ShaderDataType::Float2);
+			vbLayout->Push(Core::ShaderDataType::Float);
+			vbLayout->Push(Core::ShaderDataType::Float);
 
 			va.reset(Core::VertexArray::Create());
 			va->AddBuffer(*vb, *vbLayout);
@@ -75,57 +81,64 @@ namespace API::Misc {
 			charHeight = sheetHeight / charsPerRow;
 			characterWidth = sheetWidth / charsPerRow;
 
-			if (unicode) {
-				if (symbolsUnicode.size() == 0) ParseSymbols(fontPath, this->unicode);
+			if (unicode)
+			{
+				if (symbolsUnicode.empty()) ParseSymbols(fontPath, this->unicode);
 				symbols = &symbolsUnicode;
 			}
-			else {
-				if (symbolsGui.size() == 0) ParseSymbols(fontPath, this->unicode);
+			else
+			{
+				if (symbolsGui.empty()) ParseSymbols(fontPath, this->unicode);
 				symbols = &symbolsGui;
 			}
 		}
 
-		~FontRendererLegacy() {
-		}
+		~FontRendererLegacy() = default;
 
-		void BindFontSheet(unsigned int slot) {
+		void BindFontSheet(const unsigned int slot) const
+		{
 			fontSheet->Bind(slot);
 		}
 
-		void ParseSymbols(const std::string& fontPath, const bool unicode = false) {
+		void ParseSymbols(const std::string& fontPath, const bool unicode = false) const
+		{
 			LOGC("Parsing Fonts", LOG_COLOR::SPECIAL_A);
 
 			YAML::Node mainNode = YAML::LoadFile(fontPath);
 
-			API::Misc::SymbolInformation informationUnknown = GatherSymbolInformation(
+			SymbolInformation informationUnknown = GatherSymbolInformation(
 				mainNode["unknown"]["position"][0].as<int>(),
 				mainNode["unknown"]["position"][1].as<int>(),
-				mainNode["unknown"]["width"].as<unsigned int>()
+				mainNode["unknown"]["width"].as<int>()
 			);
 
-			for (auto symbol : mainNode["characters"]) {
+			for (auto symbol : mainNode["characters"])
+			{
 				const char character = symbol.first.as<char>();
 
-				int newWidth = (int)(symbol.second["width"].as<int>() / (255.f / sheetWidth));
+				int newWidth = (int)((float)symbol.second["width"].as<int>() / (255.f / (float)sheetWidth));
 
-				const API::Misc::SymbolInformation& information = GatherSymbolInformation(
+				const SymbolInformation& information = GatherSymbolInformation(
 					symbol.second["position"][0].as<int>(),
 					symbol.second["position"][1].as<int>() - (unicode ? 2 : 0),
 					newWidth
 				);
 
-				if (unicode) {
+				if (unicode)
+				{
 					symbolsUnicode[255] = informationUnknown;
 					symbolsUnicode[character] = information;
 				}
-				else {
+				else
+				{
 					symbolsGui[255] = informationUnknown;
 					symbolsGui[character] = information;
 				}
 			}
 		}
 
-		void Clear() {
+		void Clear() const
+		{
 			vb->Empty();
 		}
 
@@ -137,18 +150,23 @@ namespace API::Misc {
 		/// <param name="size"></param>
 		/// <param name="background"></param>
 		/// <returns>Returns the maximum width of the printed text</returns>
-		float PrintMultilineText(const char* text, const glm::vec2& position, float size = 1.f, const glm::vec4& background = {}) {
+		float PrintMultilineText(const char* text, const glm::vec2& position, float size = 1.f,
+		                         const glm::vec4& background = {})
+		{
 			const char* symPtr = text;
 			glm::vec2 symbolPosition = position;
 			float widthTotal = 0.f, widthLine = 0.f;
 
-			while (*symPtr != '\0') {
+			while (*symPtr != '\0')
+			{
 				const char symbol = *symPtr;
-				if (symbol == '\n' || *(symPtr + 1) == '\0') {
+				if (symbol == '\n' || *(symPtr + 1) == '\0')
+				{
 					widthTotal = std::max(widthTotal, widthLine);
 					widthLine = 0.f;
 
-					if (symbol == '\n') {
+					if (symbol == '\n')
+					{
 						symbolPosition.x = position.x;
 						symbolPosition.y -= (float)charHeight * size;
 
@@ -157,16 +175,18 @@ namespace API::Misc {
 					}
 				}
 
-				Misc::SymbolInformation information;
-				if (symbols->find(symbol) != symbols->end()) {
+				SymbolInformation information{};
+				if (symbols->find(symbol) != symbols->end())
+				{
 					information = (*symbols)[symbol];
 				}
-				else {
+				else
+				{
 					information = (*symbols)[255];
 				}
 
 				widthLine += AddLetter(information, symbolPosition, size, background);
-				symbolPosition.x += information.width * size;
+				symbolPosition.x += (float)information.width * size;
 
 				symPtr++;
 			}
@@ -174,16 +194,19 @@ namespace API::Misc {
 			return widthTotal;
 		}
 
-		float AddLetter(const Misc::SymbolInformation& information, const glm::vec2& position, float size = 1.f, const glm::vec4& background = {}) {
+		float AddLetter(const SymbolInformation& information, const glm::vec2& position, const float size = 1.f,
+		                const glm::vec4& background = {})
+		{
 			primitive::vertex::SymbolVertex v[4];
 
-			for (int i = 0; i < 4; i++) {
-				v[i].background = (float)Misc::mapRGBToInt(background);
-				v[i].alpha = background.a;
+			for (auto& i : v)
+			{
+				i.background = (float)mapRGBToInt(background);
+				i.alpha = background.a;
 			}
 
-			float w = information.width * size;
-			float h = charHeight * size;
+			const float w = (float)information.width * size;
+			const float h = (float)charHeight * size;
 
 			v[0].Position = position;
 			v[1].Position = position + glm::vec2(w, 0.f);
@@ -201,19 +224,20 @@ namespace API::Misc {
 			return w;
 		}
 
-		inline void Draw() {
+		inline void Draw() const
+		{
 			shader->Bind();
 			Legacy::LegacyRenderer::Draw(*va, *ib, *shader, GL_TRIANGLES, (int)count * 6);
 			shader->Unbind();
 		}
 
-		inline const size_t getCount() const { return count; }
+		[[nodiscard]] inline size_t getCount() const { return count; }
 
 	private:
 		std::shared_ptr<Texture::Texture> fontSheet;
-		static inline std::map<int, API::Misc::SymbolInformation> symbolsUnicode;
-		static inline std::map<int, API::Misc::SymbolInformation> symbolsGui;
-		std::map<int, API::Misc::SymbolInformation>* symbols;
+		static inline std::map<int, SymbolInformation> symbolsUnicode;
+		static inline std::map<int, SymbolInformation> symbolsGui;
+		std::map<int, SymbolInformation>* symbols;
 
 		static inline bool m_SymbolsParsedGui;
 		static inline bool m_SymbolsParsedAscii;
@@ -223,7 +247,7 @@ namespace API::Misc {
 		int sheetWidth;
 		int characterWidth;
 
-		size_t count;
+		size_t count{};
 		bool unicode;
 
 		std::shared_ptr<Core::VertexBuffer> vb;
@@ -231,36 +255,39 @@ namespace API::Misc {
 		std::shared_ptr<Core::VertexBufferLayout> vbLayout;
 		std::shared_ptr<Core::VertexArray> va;
 
-		glm::mat4 projection;
-		glm::mat4 view;
-		glm::vec3 translation;
+		glm::mat4 projection{};
+		glm::mat4 view{};
+		glm::vec3 translation{};
 
 		std::shared_ptr<Core::Shader> shader;
 
-		Misc::SymbolInformation GatherSymbolInformation(int posX, int posY, int width) {
-			API::Misc::SymbolInformation information{};
+		SymbolInformation GatherSymbolInformation(const int posX, const int posY, const int width) const
+		{
+			SymbolInformation information{};
 
 			glm::ivec2 imgPosition;
 			imgPosition.x = posX * characterWidth + characterWidth / 2;
 			imgPosition.y = posY * charHeight;
 
-			if (unicode) {
-				information.uv.u0.x = (imgPosition.x - characterWidth / 2.f) / sheetWidth;
-				information.uv.u3.x = (imgPosition.x - characterWidth / 2.f) / sheetWidth;
-				information.uv.u1.x = (imgPosition.x - characterWidth / 2.f + width) / sheetWidth;
-				information.uv.u2.x = (imgPosition.x - characterWidth / 2.f + width) / sheetWidth;
+			if (unicode)
+			{
+				information.uv.u0.x = ((float)imgPosition.x - (float)characterWidth / 2.f) / (float)sheetWidth;
+				information.uv.u3.x = ((float)imgPosition.x - (float)characterWidth / 2.f) / (float)sheetWidth;
+				information.uv.u1.x = ((float)imgPosition.x - (float)characterWidth / 2.f + (float)width) / (float)sheetWidth;
+				information.uv.u2.x = ((float)imgPosition.x - (float)characterWidth / 2.f + (float)width) / (float)sheetWidth;
 			}
-			else {
-				information.uv.u0.x = (imgPosition.x - width / 2.f) / sheetWidth;
-				information.uv.u3.x = (imgPosition.x - width / 2.f) / sheetWidth;
-				information.uv.u1.x = (imgPosition.x + width / 2.f) / sheetWidth;
-				information.uv.u2.x = (imgPosition.x + width / 2.f) / sheetWidth;
+			else
+			{
+				information.uv.u0.x = ((float)imgPosition.x - (float)width / 2.f) / (float)sheetWidth;
+				information.uv.u3.x = ((float)imgPosition.x - (float)width / 2.f) / (float)sheetWidth;
+				information.uv.u1.x = ((float)imgPosition.x + (float)width / 2.f) / (float)sheetWidth;
+				information.uv.u2.x = ((float)imgPosition.x + (float)width / 2.f) / (float)sheetWidth;
 			}
 
 			information.uv.u0.y = (float)imgPosition.y / (float)sheetHeight;
 			information.uv.u1.y = (float)imgPosition.y / (float)sheetHeight;
-			information.uv.u2.y = (imgPosition.y + charHeight) / (float)sheetHeight;
-			information.uv.u3.y = (imgPosition.y + charHeight) / (float)sheetHeight;
+			information.uv.u2.y = (float)(imgPosition.y + charHeight) / (float)sheetHeight;
+			information.uv.u3.y = (float)(imgPosition.y + charHeight) / (float)sheetHeight;
 
 			information.width = width;
 

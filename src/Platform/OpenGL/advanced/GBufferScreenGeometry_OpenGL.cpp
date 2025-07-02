@@ -4,24 +4,26 @@
 #include "vendor/glm/glm.hpp"
 #include <vendor/glm/ext/matrix_clip_space.hpp>
 
-OpenGL::Advanced::GBufferScreenGeometry_OpenGL::GBufferScreenGeometry_OpenGL(unsigned int width, unsigned int height)
-	:Width(width), Height(height)
+#include "GL/glew.h"
+
+OpenGL::Advanced::GBufferScreenGeometry_OpenGL::GBufferScreenGeometry_OpenGL(const unsigned int width, const unsigned int height)
+	: Width(width), Height(height)
 {
 	ProjectionMat = glm::ortho(0.0f, (float)width, 0.0f, (float)height, -1.0f, 1.0f);
 
-	unsigned int index[] = {
+	constexpr unsigned int index[] = {
 		0, 1, 2, 2, 3, 0
 	};
 
 	IBO.reset(API::Core::IndexBuffer::Create(index, 6));
 	VBO.reset(API::Core::VertexBuffer::Create(4, sizeof(float) * 5));
 
-	float vert[] = {
+	constexpr float vert[] = {
 		// Positions        // UVs
-		-1.f, -1.f, 0.f,     0.f, 0.f,  // Bottom-left
-		 1.f, -1.f, 0.f,     1.f, 0.f,  // Bottom-right
-		 1.f,  1.f, 0.f,     1.f, 1.f,  // Top-right
-		-1.f,  1.f, 0.f,     0.f, 1.f   // Top-left
+		-1.f, -1.f, 0.f, 0.f, 0.f, // Bottom-left
+		1.f, -1.f, 0.f, 1.f, 0.f, // Bottom-right
+		1.f, 1.f, 0.f, 1.f, 1.f, // Top-right
+		-1.f, 1.f, 0.f, 0.f, 1.f // Top-left
 	};
 
 	VBO->Bind();
@@ -46,7 +48,7 @@ void OpenGL::Advanced::GBufferScreenGeometry_OpenGL::Draw(API::Core::Shader* sha
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
 }
 
-void OpenGL::Advanced::GBufferScreenGeometry_OpenGL::Resize(unsigned int width, unsigned int height)
+void OpenGL::Advanced::GBufferScreenGeometry_OpenGL::Resize(const unsigned int width, const unsigned int height)
 {
 	Width = width;
 	Height = height;

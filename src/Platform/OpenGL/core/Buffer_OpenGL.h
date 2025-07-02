@@ -1,13 +1,13 @@
 #pragma once
 
-#include "Debug/Debug.h"
-
 #include "API/core/Buffer.h"
 
 #include <GL/glew.h>
 
-namespace OpenGL::Core {
-	class Buffer_OpenGL : public API::Core::Buffer {
+namespace OpenGL::Core
+{
+	class Buffer_OpenGL final : public API::Core::Buffer
+	{
 	public:
 		Buffer_OpenGL(BufferType type, MemoryLayout layout, const void* data, unsigned int size);
 		Buffer_OpenGL(BufferType type, MemoryLayout layout, size_t capacity);
@@ -28,11 +28,11 @@ namespace OpenGL::Core {
 		void BindBase(int slot) const override;
 
 	private:
-		GLenum mapBufferType(BufferType type);
-		GLenum mapMemoryLayout(MemoryLayout layout);
+		static GLenum mapBufferType(BufferType type);
+		static GLenum mapMemoryLayout(MemoryLayout layout);
 
 	private:
-		GLenum type;
-		unsigned int m_RendererID;
+		GLenum type{};
+		unsigned int m_RendererID{};
 	};
 }

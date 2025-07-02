@@ -1,22 +1,22 @@
 #pragma once
 
-#include "vendor/stb_image/stb_image.h"
 #include "API/texture/Texture.h"
 
-namespace OpenGL::Texture {
-	class Texture_OpenGL : public API::Texture::Texture
+namespace OpenGL::Texture
+{
+	class Texture_OpenGL final : public API::Texture::Texture
 	{
 	public:
-		Texture_OpenGL(const std::string& path, API::Texture::TextureFilter filter, const bool flipUV);
-		~Texture_OpenGL();
+		Texture_OpenGL(const std::string& path, API::Texture::TextureFilter filter, bool flipUV);
+		~Texture_OpenGL() override;
 
 		uint64_t MakeResident() override;
 		uint64_t GenerateHandle() override;
 
-		int Bind(const unsigned int slot = 0) override;
+		int Bind(unsigned int slot) override;
 		void Unbind() override;
 
 	private:
-		int MapGLFilter(API::Texture::TextureFilter filter);
+		static int MapGLFilter(API::Texture::TextureFilter filter);
 	};
 }

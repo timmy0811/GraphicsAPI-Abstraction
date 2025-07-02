@@ -13,13 +13,15 @@
 
 #include <vector>
 
-namespace API::Model {
+namespace API::Model
+{
 	class Mesh
 	{
 	public:
-		Mesh(std::vector<API::primitive::vertex::VertexMesh> vertices, std::vector<unsigned int> indices, std::vector<API::Texture::Texture*> textures);
+		Mesh(const std::vector<primitive::vertex::VertexMesh>& vertices, const std::vector<unsigned int>& indices,
+		     const std::vector<Texture::Texture*>& textures);
 
-		void Draw(Core::Shader& shader);
+		void Draw(Core::Shader& shader) const;
 
 	private:
 		std::vector<primitive::vertex::VertexMesh> m_Vertices;
@@ -31,6 +33,6 @@ namespace API::Model {
 		std::unique_ptr<Core::VertexBufferLayout> m_VBLayout;
 		std::unique_ptr<Core::IndexBuffer> m_IB;
 
-		void LoadTextures(Core::Shader& shader);
+		void LoadTextures(Core::Shader& shader) const;
 	};
 }

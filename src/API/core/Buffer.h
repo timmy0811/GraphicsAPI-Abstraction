@@ -39,8 +39,8 @@ namespace API::Core {
 
 		virtual void BindBase(int slot) const = 0;
 
-		virtual inline size_t GetCapacity() const { return m_BufferSize; };
-		virtual inline size_t GetSize() const { return m_DataPtr; };
+		[[nodiscard]] virtual inline size_t GetCapacity() const { return m_BufferSize; }
+		[[nodiscard]] virtual inline size_t GetSize() const { return m_DataPtr; }
 
 		static Buffer* Create(BufferType type, MemoryLayout layout, const void* data, unsigned int size);
 		static Buffer* Create(BufferType type, MemoryLayout layout, size_t capacity);
@@ -48,6 +48,6 @@ namespace API::Core {
 
 	protected:
 		size_t m_DataPtr = 0;
-		size_t m_BufferSize;
+		size_t m_BufferSize{};
 	};
 }

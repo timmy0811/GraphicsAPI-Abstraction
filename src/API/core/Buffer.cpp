@@ -4,36 +4,42 @@
 #include "Renderer.h"
 #include "Platform/OpenGL/core/Buffer_OpenGL.h"
 
-API::Core::Buffer* API::Core::Buffer::Create(BufferType type, MemoryLayout layout, const void* data, unsigned int size)
+API::Core::Buffer* API::Core::Buffer::Create(const BufferType type, const MemoryLayout layout, const void* data,
+                                             const unsigned int size)
 {
-	switch (API::Core::DefaultRendererContext::GetAPI())
+	switch (DefaultRendererContext::GetAPI())
 	{
-	case API::Core::RendererAPI::API_ENUM::None:    API_ASSERT(false, "RendererAPI::None is currently not supported!"); return nullptr;
-	case API::Core::RendererAPI::API_ENUM::OpenGL:  return new OpenGL::Core::Buffer_OpenGL(type, layout, data, size);
+	case RendererAPI::API_ENUM::None: API_ASSERT(false, "RendererAPI::None is currently not supported!");
+		return nullptr;
+	case RendererAPI::API_ENUM::OpenGL: return new OpenGL::Core::Buffer_OpenGL(type, layout, data, size);
 	}
 
 	API_ASSERT(false, "Unknown RendererAPI!");
 	return nullptr;
 }
 
-API::Core::Buffer* API::Core::Buffer::Create(BufferType type, MemoryLayout layout, size_t capacity)
+API::Core::Buffer* API::Core::Buffer::Create(const BufferType type, const MemoryLayout layout, const size_t capacity)
 {
-	switch (API::Core::DefaultRendererContext::GetAPI())
+	switch (DefaultRendererContext::GetAPI())
 	{
-	case API::Core::RendererAPI::API_ENUM::None:    API_ASSERT(false, "RendererAPI::None is currently not supported!"); return nullptr;
-	case API::Core::RendererAPI::API_ENUM::OpenGL:  return new OpenGL::Core::Buffer_OpenGL(type, layout, capacity);
+	case RendererAPI::API_ENUM::None: API_ASSERT(false, "RendererAPI::None is currently not supported!");
+		return nullptr;
+	case RendererAPI::API_ENUM::OpenGL: return new OpenGL::Core::Buffer_OpenGL(type, layout, capacity);
 	}
 
 	API_ASSERT(false, "Unknown RendererAPI!");
 	return nullptr;
 }
 
-API::Core::Buffer* API::Core::Buffer::Create(BufferType type, MemoryLayout layout, unsigned int count, size_t elementSize)
+API::Core::Buffer* API::Core::Buffer::Create(const BufferType type, const MemoryLayout layout, const unsigned int count,
+                                             const size_t elementSize)
 {
-	switch (API::Core::DefaultRendererContext::GetAPI())
+	switch (DefaultRendererContext::GetAPI())
 	{
-	case API::Core::RendererAPI::API_ENUM::None:    API_ASSERT(false, "RendererAPI::None is currently not supported!"); return nullptr;
-	case API::Core::RendererAPI::API_ENUM::OpenGL:  return new OpenGL::Core::Buffer_OpenGL(type, layout, count, elementSize);
+	case RendererAPI::API_ENUM::None: API_ASSERT(false, "RendererAPI::None is currently not supported!");
+		return nullptr;
+	case RendererAPI::API_ENUM::OpenGL: return new OpenGL::Core::Buffer_OpenGL(
+			type, layout, count, elementSize);
 	}
 
 	API_ASSERT(false, "Unknown RendererAPI!");

@@ -3,10 +3,12 @@
 
 #include "Debug/Debug.h"
 
+#include "vendor/stb_image/stb_image.h"
+
 #include <GL/glew.h>
 #include <iostream>
 
-OpenGL::Texture::Texture_OpenGL::Texture_OpenGL(const std::string& path, API::Texture::TextureFilter filter, const bool flipUV)
+OpenGL::Texture::Texture_OpenGL::Texture_OpenGL(const std::string& path, const API::Texture::TextureFilter filter, const bool flipUV)
 {
 	m_Filepath = path;
 	m_LocalBuffer = nullptr;
@@ -16,7 +18,8 @@ OpenGL::Texture::Texture_OpenGL::Texture_OpenGL(const std::string& path, API::Te
 	else stbi_set_flip_vertically_on_load(0);
 
 	m_LocalBuffer = stbi_load(path.c_str(), &m_Width, &m_Height, &m_BPP, 4);
-	if (!m_LocalBuffer) {
+	if (!m_LocalBuffer)
+	{
 		LOG_GL_ERROR("Could not load {}", path);
 		Error = true;
 		return;

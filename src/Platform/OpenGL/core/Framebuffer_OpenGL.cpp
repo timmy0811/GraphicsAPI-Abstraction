@@ -1,30 +1,35 @@
 #include "glpch.h"
 #include "Framebuffer_OpenGL.h"
 
-OpenGL::Core::Framebuffer_OpenGL::Framebuffer_OpenGL(const glm::ivec2& size, bool attachDepth, API::Core::DepthBufferType depthType)
+OpenGL::Core::Framebuffer_OpenGL::Framebuffer_OpenGL(const glm::ivec2& size, const bool attachDepth,
+                                                     const API::Core::DepthBufferType depthType):
+	m_BoundPort(-1)
 {
 	m_Width = size.x;
 	m_Height = size.y;
 
-	m_Attachements.reserve(MAX_BUF);
+	m_Attachments.reserve(MAX_BUF);
 
 	GLCall(glGenFramebuffers(1, &m_IdFBO));
 	GLCall(glBindFramebuffer(GL_FRAMEBUFFER, m_IdFBO));
 
-	if (attachDepth) {
+	if (attachDepth)
+	{
 		switch (depthType)
 		{
 		case API::Core::DepthBufferType::WRITE_ONLY:
 			glGenRenderbuffers(1, &m_RBODepth);
 			glBindRenderbuffer(GL_RENDERBUFFER, m_RBODepth);
-			glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, m_Width, m_Height);
+			glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, (int)m_Width, (int)m_Height);
 			glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, m_RBODepth);
 
 			break;
 		case API::Core::DepthBufferType::WRITE_READ:
 			GLCall(glGenTextures(1, &m_RBODepth));
 			GLCall(glBindTexture(GL_TEXTURE_2D, m_RBODepth));
-			GLCall(glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, m_Width, m_Height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL));
+			GLCall(
+				glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, m_Width, m_Height, 0, GL_DEPTH_COMPONENT, GL_FLOAT,
+					nullptr));
 
 			GLCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST));
 			GLCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST));
@@ -44,44 +49,46 @@ OpenGL::Core::Framebuffer_OpenGL::Framebuffer_OpenGL(const glm::ivec2& size, boo
 		}
 	}
 
-	GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+	const GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
 
-	if (status != GL_FRAMEBUFFER_COMPLETE) {
+	if (status != GL_FRAMEBUFFER_COMPLETE)
+	{
 		std::cout << "[OpenGL Error] (" << std::to_string(status) << ")" << std::endl;
 	}
 
 	GLCall(glBindFramebuffer(GL_FRAMEBUFFER, 0));
 }
 
-OpenGL::Core::Framebuffer_OpenGL::Framebuffer_OpenGL(const glm::ivec2& size)
+OpenGL::Core::Framebuffer_OpenGL::Framebuffer_OpenGL(const glm::ivec2& size): m_BoundPort(-1)
 {
 	m_Width = size.x;
 	m_Height = size.y;
 
-	m_Attachements.reserve(MAX_BUF);
+	m_Attachments.reserve(MAX_BUF);
 
 	GLCall(glGenFramebuffers(1, &m_IdFBO));
 	GLCall(glBindFramebuffer(GL_FRAMEBUFFER, m_IdFBO));
 
-	m_Attachements.push_back(GL_COLOR_ATTACHMENT0);
+	m_Attachments.push_back(GL_COLOR_ATTACHMENT0);
 
 	// Color attachment
-	glGenTextures(1, &m_Attachements[0]);
-	glBindTexture(GL_TEXTURE_2D, m_Attachements[0]);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, m_Width, m_Height, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
+	glGenTextures(1, &m_Attachments[0]);
+	glBindTexture(GL_TEXTURE_2D, m_Attachments[0]);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, (int)m_Width, (int)m_Height, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_Attachements[0], 0);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_Attachments[0], 0);
 
 	// Depth attachment
 	glGenRenderbuffers(1, &m_RBODepth);
 	glBindRenderbuffer(GL_RENDERBUFFER, m_RBODepth);
-	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, m_Width, m_Height);
+	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, (int)m_Width, (int)m_Height);
 	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, m_RBODepth);
 
-	GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+	const GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
 
-	if (status != GL_FRAMEBUFFER_COMPLETE) {
+	if (status != GL_FRAMEBUFFER_COMPLETE)
+	{
 		std::cout << "[OpenGL Error] (" << std::to_string(status) << ")" << std::endl;
 	}
 
@@ -96,7 +103,7 @@ unsigned int OpenGL::Core::Framebuffer_OpenGL::BindDepthTexture(const unsigned i
 	return m_BoundPort;
 }
 
-void OpenGL::Core::Framebuffer_OpenGL::Bind(unsigned int Framebuffer)
+void OpenGL::Core::Framebuffer_OpenGL::Bind(const unsigned int Framebuffer)
 {
 	GLCall(glBindFramebuffer(GL_DRAW_FRAMEBUFFER, Framebuffer));
 }
@@ -121,43 +128,47 @@ void OpenGL::Core::Framebuffer_OpenGL::Unbind()
 
 void OpenGL::Core::Framebuffer_OpenGL::BindTextures(const unsigned int startSlot)
 {
-	for (int i = 0; i < m_Buffers.size(); i++) {
+	for (int i = 0; i < m_Buffers.size(); i++)
+	{
 		GLCall(glActiveTexture(GL_TEXTURE0 + startSlot + i));
 		GLCall(glBindTexture(GL_TEXTURE_2D, m_Buffers[i]));
 	}
 }
 
-void OpenGL::Core::Framebuffer_OpenGL::BindTexture(int index, const unsigned int startSlot)
+void OpenGL::Core::Framebuffer_OpenGL::BindTexture(const int index, const unsigned int startSlot)
 {
 	GLCall(glActiveTexture(GL_TEXTURE0 + startSlot));
 	GLCall(glBindTexture(GL_TEXTURE_2D, m_Buffers[index]));
 }
 
-bool OpenGL::Core::Framebuffer_OpenGL::PushColorAttribute(const char channel, API::Core::BufferDataType dataType, const void* data)
+bool OpenGL::Core::Framebuffer_OpenGL::PushColorAttribute(const char channel, const API::Core::BufferDataType dataType,
+                                                          const void* data)
 {
-	TextureFormat format = GetTextureFormat(channel, dataType);
+	const TextureFormat format = GetTextureFormat(channel, dataType);
 
-	size_t size = m_Buffers.size();
+	const size_t size = m_Buffers.size();
 	m_Buffers.push_back(0);
 
 	GLCall(glGenTextures(1, &(m_Buffers[size])));
 	GLCall(glBindTexture(GL_TEXTURE_2D, m_Buffers[size]));
-	GLCall(glTexImage2D(GL_TEXTURE_2D, 0, format.InternalFormat, m_Width, m_Height, 0, format.Format, format.Type, data));
+	GLCall(
+		glTexImage2D(GL_TEXTURE_2D, 0, format.InternalFormat, m_Width, m_Height, 0, format.Format, format.Type, data));
 	GLCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST));
 	GLCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST));
 	GLCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE));
 	GLCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE));
 	GLCall(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + (int)size, GL_TEXTURE_2D, m_Buffers[size], 0));
 
-	m_Attachements.push_back(GL_COLOR_ATTACHMENT0 + (int)m_Attachements.size());
-	glDrawBuffers((int)m_Attachements.size(), &m_Attachements[0]);
+	m_Attachments.push_back(GL_COLOR_ATTACHMENT0 + (int)m_Attachments.size());
+	glDrawBuffers((int)m_Attachments.size(), &m_Attachments[0]);
 
 	return true;
 }
 
-bool OpenGL::Core::Framebuffer_OpenGL::PushColorAttribute(unsigned int internalFormat, unsigned int format, unsigned int dataType, const void* data)
+bool OpenGL::Core::Framebuffer_OpenGL::PushColorAttribute(const unsigned int internalFormat, const unsigned int format,
+                                                          const unsigned int dataType, const void* data)
 {
-	size_t size = m_Buffers.size();
+	const size_t size = m_Buffers.size();
 	m_Buffers.push_back(0);
 
 	GLCall(glGenTextures(1, &(m_Buffers[size])));
@@ -169,23 +180,24 @@ bool OpenGL::Core::Framebuffer_OpenGL::PushColorAttribute(unsigned int internalF
 	GLCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE));
 	GLCall(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + (int)size, GL_TEXTURE_2D, m_Buffers[size], 0));
 
-	m_Attachements.push_back(GL_COLOR_ATTACHMENT0 + (int)m_Attachements.size());
-	glDrawBuffers((int)m_Attachements.size(), &m_Attachements[0]);
+	m_Attachments.push_back(GL_COLOR_ATTACHMENT0 + (int)m_Attachments.size());
+	glDrawBuffers((int)m_Attachments.size(), &m_Attachments[0]);
 
 	return true;
 }
 
-inline unsigned int OpenGL::Core::Framebuffer_OpenGL::GetColorAttachmentTextureID(unsigned int index)
+inline unsigned int OpenGL::Core::Framebuffer_OpenGL::GetColorAttachmentTextureID(const unsigned int index)
 {
-	return m_Attachements[index];
+	return m_Attachments[index];
 }
 
 inline bool OpenGL::Core::Framebuffer_OpenGL::Validate() const
 {
 	Bind();
-	GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+	const GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
 
-	if (status != GL_FRAMEBUFFER_COMPLETE) {
+	if (status != GL_FRAMEBUFFER_COMPLETE)
+	{
 		std::cout << "[OpenGL Error] (" << std::to_string(status) << ")" << std::endl;
 		GLCall(glBindFramebuffer(GL_FRAMEBUFFER, 0));
 		return false;
@@ -195,90 +207,124 @@ inline bool OpenGL::Core::Framebuffer_OpenGL::Validate() const
 	return true;
 }
 
-OpenGL::Core::Framebuffer_OpenGL::TextureFormat OpenGL::Core::Framebuffer_OpenGL::GetTextureFormat(unsigned int components, API::Core::BufferDataType datatype)
+OpenGL::Core::Framebuffer_OpenGL::TextureFormat OpenGL::Core::Framebuffer_OpenGL::GetTextureFormat(
+	const unsigned int components, const API::Core::BufferDataType datatype)
 {
-	TextureFormat format;
+	TextureFormat format{};
 
-	switch (components) {
-	case 1: format.Format = GL_RED; break;
-	case 2: format.Format = GL_RG; break;
-	case 3: format.Format = GL_RGB; break;
-	case 4: format.Format = GL_RGBA; break;
+	switch (components)
+	{
+	case 1: format.Format = GL_RED;
+		break;
+	case 2: format.Format = GL_RG;
+		break;
+	case 3: format.Format = GL_RGB;
+		break;
+	case 4: format.Format = GL_RGBA;
+		break;
 	default:
 		LOG_GL_ERROR("Invalid component count: must be 1, 2, 3, or 4.");
 		return {};
 	}
 
-	switch (datatype) {
+	switch (datatype)
+	{
 	case API::Core::BufferDataType::_FLOAT:
-		format.InternalFormat = (components == 1) ? GL_R32F :
-			(components == 2) ? GL_RG32F :
-			(components == 3) ? GL_RGB32F :
-			GL_RGBA32F;
+		format.InternalFormat = (components == 1)
+			                        ? GL_R32F
+			                        : (components == 2)
+			                        ? GL_RG32F
+			                        : (components == 3)
+			                        ? GL_RGB32F
+			                        : GL_RGBA32F;
 		format.Type = GL_FLOAT;
 		break;
 
 	case API::Core::BufferDataType::_FLOAT16:
-		format.InternalFormat = (components == 1) ? GL_R16F :
-			(components == 2) ? GL_RG16F :
-			(components == 3) ? GL_RGB16F :
-			GL_RGBA16F;
+		format.InternalFormat = (components == 1)
+			                        ? GL_R16F
+			                        : (components == 2)
+			                        ? GL_RG16F
+			                        : (components == 3)
+			                        ? GL_RGB16F
+			                        : GL_RGBA16F;
 		format.Type = GL_HALF_FLOAT;
 		break;
 
 	case API::Core::BufferDataType::_DOUBLE:
-		format.InternalFormat = (components == 1) ? GL_R32F :
-			(components == 2) ? GL_RG32F :
-			(components == 3) ? GL_RGB32F :
-			GL_RGBA32F;
+		format.InternalFormat = (components == 1)
+			                        ? GL_R32F
+			                        : (components == 2)
+			                        ? GL_RG32F
+			                        : (components == 3)
+			                        ? GL_RGB32F
+			                        : GL_RGBA32F;
 		format.Type = GL_DOUBLE;
 		break;
 
 	case API::Core::BufferDataType::_BYTE_UNSIGNED:
-		format.InternalFormat = (components == 1) ? GL_R8 :
-			(components == 2) ? GL_RG8 :
-			(components == 3) ? GL_RGB8 :
-			GL_RGBA8;
+		format.InternalFormat = (components == 1)
+			                        ? GL_R8
+			                        : (components == 2)
+			                        ? GL_RG8
+			                        : (components == 3)
+			                        ? GL_RGB8
+			                        : GL_RGBA8;
 		format.Type = GL_UNSIGNED_BYTE;
 		break;
 
 	case API::Core::BufferDataType::_BYTE:
-		format.InternalFormat = (components == 1) ? GL_R8_SNORM :
-			(components == 2) ? GL_RG8_SNORM :
-			(components == 3) ? GL_RGB8_SNORM :
-			GL_RGBA8_SNORM;
+		format.InternalFormat = (components == 1)
+			                        ? GL_R8_SNORM
+			                        : (components == 2)
+			                        ? GL_RG8_SNORM
+			                        : (components == 3)
+			                        ? GL_RGB8_SNORM
+			                        : GL_RGBA8_SNORM;
 		format.Type = GL_BYTE;
 		break;
 
 	case API::Core::BufferDataType::_SHORT:
-		format.InternalFormat = (components == 1) ? GL_R16_SNORM :
-			(components == 2) ? GL_RG16_SNORM :
-			(components == 3) ? GL_RGB16_SNORM :
-			GL_RGBA16_SNORM;
+		format.InternalFormat = (components == 1)
+			                        ? GL_R16_SNORM
+			                        : (components == 2)
+			                        ? GL_RG16_SNORM
+			                        : (components == 3)
+			                        ? GL_RGB16_SNORM
+			                        : GL_RGBA16_SNORM;
 		format.Type = GL_SHORT;
 		break;
 
 	case API::Core::BufferDataType::_SHORT_UNSIGNED:
-		format.InternalFormat = (components == 1) ? GL_R16 :
-			(components == 2) ? GL_RG16 :
-			(components == 3) ? GL_RGB16 :
-			GL_RGBA16;
+		format.InternalFormat = (components == 1)
+			                        ? GL_R16
+			                        : (components == 2)
+			                        ? GL_RG16
+			                        : (components == 3)
+			                        ? GL_RGB16
+			                        : GL_RGBA16;
 		format.Type = GL_UNSIGNED_SHORT;
 		break;
 
 	case API::Core::BufferDataType::_INT:
-		format.InternalFormat = (components == 1) ? GL_R32I :
-			(components == 2) ? GL_RG32I :
-			(components == 3) ? GL_RGB32I :
-			GL_RGBA32I;
+		format.InternalFormat = (components == 1)
+			                        ? GL_R32I
+			                        : (components == 2)
+			                        ? GL_RG32I
+			                        : (components == 3)
+			                        ? GL_RGB32I
+			                        : GL_RGBA32I;
 		format.Type = GL_INT;
 		break;
 
 	case API::Core::BufferDataType::_INT_UNSIGNED:
-		format.InternalFormat = (components == 1) ? GL_R32UI :
-			(components == 2) ? GL_RG32UI :
-			(components == 3) ? GL_RGB32UI :
-			GL_RGBA32UI;
+		format.InternalFormat = (components == 1)
+			                        ? GL_R32UI
+			                        : (components == 2)
+			                        ? GL_RG32UI
+			                        : (components == 3)
+			                        ? GL_RGB32UI
+			                        : GL_RGBA32UI;
 		format.Type = GL_UNSIGNED_INT;
 		break;
 

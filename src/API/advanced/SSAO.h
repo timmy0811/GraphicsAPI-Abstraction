@@ -8,12 +8,13 @@ namespace API::Advanced {
 	class SSAO
 	{
 	public:
+		virtual ~SSAO() = default;
 		SSAO();
 
 		void GenerateSampleKernel(int samples = 64);
 		virtual void GenerateSSAONoiseMap() = 0;
-		glm::vec3* getKernelAllocator() { return &(m_Kernel[0]); }
-		virtual void BindNoiseTex(const unsigned int slot) = 0;
+		glm::vec3* getKernelAllocator() { return &m_Kernel[0]; }
+		virtual void BindNoiseTex(unsigned int slot) = 0;
 
 		static inline SSAO* Create();
 

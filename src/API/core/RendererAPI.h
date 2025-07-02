@@ -7,10 +7,13 @@
 #include "IndexBuffer.h"
 #include "PropertyEnums.h"
 
-namespace API::Core {
+namespace API::Core
+{
 	class RendererAPI
 	{
 	public:
+		virtual ~RendererAPI() = default;
+
 		enum class API_ENUM
 		{
 			None = 0, OpenGL = 1
@@ -48,10 +51,10 @@ namespace API::Core {
 
 		inline static API_ENUM GetAPI() { return s_API; }
 
-		virtual const std::string GetAPIVer() const = 0;
-		virtual const std::string GetGPUID() const = 0;
-		virtual const std::string GetPublisher() const = 0;
-		virtual const std::string GetShaderLanID() const = 0;
+		[[nodiscard]] virtual std::string GetAPIVer() const = 0;
+		[[nodiscard]] virtual std::string GetGPUID() const = 0;
+		[[nodiscard]] virtual std::string GetPublisher() const = 0;
+		[[nodiscard]] virtual std::string GetShaderLanID() const = 0;
 
 	private:
 		static API_ENUM s_API;

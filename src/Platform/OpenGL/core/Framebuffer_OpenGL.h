@@ -7,14 +7,16 @@
 #include <vector>
 #include <GL/glew.h>
 
-namespace OpenGL::Core {
-	class Framebuffer_OpenGL : public API::Core::Framebuffer
+namespace OpenGL::Core
+{
+	class Framebuffer_OpenGL final : public API::Core::Framebuffer
 	{
 	public:
-		Framebuffer_OpenGL(const glm::ivec2& size, bool attachDepth, API::Core::DepthBufferType depthType = API::Core::DepthBufferType::WRITE_ONLY);
-		Framebuffer_OpenGL(const glm::ivec2& size);
+		Framebuffer_OpenGL(const glm::ivec2& size, bool attachDepth,
+		                   API::Core::DepthBufferType depthType = API::Core::DepthBufferType::WRITE_ONLY);
+		explicit Framebuffer_OpenGL(const glm::ivec2& size);
 
-		int GetInternalId() const override { return m_IdFBO; }
+		[[nodiscard]] int GetInternalId() const override { return (int)m_IdFBO; }
 
 		void Bind(unsigned int Framebuffer) override;
 
@@ -22,17 +24,17 @@ namespace OpenGL::Core {
 		void BindAndClear() override;
 		void Unbind() override;
 
-		void BindTextures(const unsigned int startSlot = 0) override;
-		void BindTexture(int index, const unsigned int startSlot = 0) override;
-		unsigned int BindDepthTexture(const unsigned int slot) override;
+		void BindTextures(unsigned int startSlot) override;
+		void BindTexture(int index, unsigned int startSlot) override;
+		unsigned int BindDepthTexture(unsigned int slot) override;
 
-		bool PushColorAttribute(const char channel = 3, API::Core::BufferDataType dataType = API::Core::BufferDataType::_FLOAT, const void* data = nullptr) override;
-		bool PushColorAttribute(unsigned int internalFormat = GL_RGBA16F, unsigned int format = GL_RGBA, unsigned int dataType = GL_FLOAT, const void* data = nullptr) override;
+		bool PushColorAttribute(char channel, API::Core::BufferDataType dataType, const void* data) override;
+		bool PushColorAttribute(unsigned int internalFormat, unsigned int format, unsigned int dataType, const void* data) override;
 
-		virtual inline unsigned int GetColorAttachmentTextureID(unsigned int index) override;
+		inline unsigned int GetColorAttachmentTextureID(unsigned int index) override;
 
-		inline size_t AttachementCount() const override { return m_Attachements.size(); }
-		inline bool Validate() const override;
+		[[nodiscard]] inline size_t AttachmentCount() const override { return m_Attachments.size(); }
+		[[nodiscard]] inline bool Validate() const override;
 
 	private:
 		struct TextureFormat
@@ -42,12 +44,12 @@ namespace OpenGL::Core {
 			GLenum Type;
 		};
 
-		TextureFormat GetTextureFormat(unsigned int components, API::Core::BufferDataType datatype);
+		static TextureFormat GetTextureFormat(unsigned int components, API::Core::BufferDataType datatype);
 
 	private:
-		unsigned int m_IdFBO, m_RBODepth;
+		unsigned int m_IdFBO{}, m_RBODepth{};
 		std::vector<GLuint> m_Buffers;
-		std::vector<GLuint> m_Attachements;
+		std::vector<GLuint> m_Attachments;
 
 		int m_BoundPort;
 	};

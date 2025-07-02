@@ -1,13 +1,16 @@
 #pragma once
 
 #include "API/core/PropertyEnums.h"
-#include <gl/glew.h>
+#include <GL/glew.h>
 
 #include "Debug/Log.h"
 
-namespace OpenGL::Core {
-	GLenum GLBlendFunction(API::Core::BlendFunction function) {
-		switch (function) {
+namespace OpenGL::Core
+{
+	inline GLenum GLBlendFunction(const API::Core::BlendFunction function)
+	{
+		switch (function)
+		{
 		case API::Core::BlendFunction::Zero: return GL_ZERO;
 		case API::Core::BlendFunction::One: return GL_ONE;
 		case API::Core::BlendFunction::SrcColor: return GL_SRC_COLOR;
@@ -28,8 +31,10 @@ namespace OpenGL::Core {
 		}
 	}
 
-	GLenum GLFaceCull(API::Core::Face cull) {
-		switch (cull) {
+	inline GLenum GLFaceCull(const API::Core::Face cull)
+	{
+		switch (cull)
+		{
 		case API::Core::Face::Front: return GL_FRONT;
 		case API::Core::Face::Back: return GL_BACK;
 		case API::Core::Face::FrontAndBack: return GL_FRONT_AND_BACK;
@@ -39,8 +44,10 @@ namespace OpenGL::Core {
 		}
 	}
 
-	GLenum GLDepthFunction(API::Core::DepthFunction function) {
-		switch (function) {
+	inline GLenum GLDepthFunction(const API::Core::DepthFunction function)
+	{
+		switch (function)
+		{
 		case API::Core::DepthFunction::Never: return GL_NEVER;
 		case API::Core::DepthFunction::Less: return GL_LESS;
 		case API::Core::DepthFunction::Equal: return GL_EQUAL;
@@ -55,8 +62,10 @@ namespace OpenGL::Core {
 		}
 	}
 
-	GLenum GLStencilFunction(API::Core::StencilFunction function) {
-		switch (function) {
+	inline GLenum GLStencilFunction(const API::Core::StencilFunction function)
+	{
+		switch (function)
+		{
 		case API::Core::StencilFunction::Never: return GL_NEVER;
 		case API::Core::StencilFunction::Less: return GL_LESS;
 		case API::Core::StencilFunction::Equal: return GL_EQUAL;
@@ -71,8 +80,10 @@ namespace OpenGL::Core {
 		}
 	}
 
-	GLenum GLStencilOperation(API::Core::StencilOperation operation) {
-		switch (operation) {
+	inline GLenum GLStencilOperation(const API::Core::StencilOperation operation)
+	{
+		switch (operation)
+		{
 		case API::Core::StencilOperation::Keep: return GL_KEEP;
 		case API::Core::StencilOperation::Zero: return GL_ZERO;
 		case API::Core::StencilOperation::Replace: return GL_REPLACE;
@@ -86,8 +97,10 @@ namespace OpenGL::Core {
 		}
 	}
 
-	GLenum GLBufferUsage(API::Core::BufferUsage usage) {
-		switch (usage) {
+	inline GLenum GLBufferUsage(const API::Core::BufferUsage usage)
+	{
+		switch (usage)
+		{
 		case API::Core::BufferUsage::Static: return GL_STATIC_DRAW;
 		case API::Core::BufferUsage::Dynamic: return GL_DYNAMIC_DRAW;
 		case API::Core::BufferUsage::Stream: return GL_STREAM_DRAW;
@@ -97,8 +110,10 @@ namespace OpenGL::Core {
 		}
 	}
 
-	GLenum GLFrontFace(API::Core::FrontFace face) {
-		switch (face) {
+	inline GLenum GLFrontFace(const API::Core::FrontFace face)
+	{
+		switch (face)
+		{
 		case API::Core::FrontFace::Clockwise: return GL_CW;
 		case API::Core::FrontFace::CounterClockwise: return GL_CCW;
 		default:
@@ -107,8 +122,10 @@ namespace OpenGL::Core {
 		}
 	}
 
-	GLenum GLAntiAliasingMethod(API::Core::AntiAliasingMethod method) {
-		switch (method) {
+	inline GLenum GLAntiAliasingMethod(const API::Core::AntiAliasingMethod method)
+	{
+		switch (method)
+		{
 		case API::Core::AntiAliasingMethod::Multisample: return GL_MULTISAMPLE;
 		case API::Core::AntiAliasingMethod::SampleAlphaToCoverage: return GL_SAMPLE_ALPHA_TO_COVERAGE;
 		case API::Core::AntiAliasingMethod::SampleAlphaToOne: return GL_SAMPLE_ALPHA_TO_ONE;

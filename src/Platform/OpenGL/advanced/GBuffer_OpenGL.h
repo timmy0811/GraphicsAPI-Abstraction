@@ -1,16 +1,17 @@
 #pragma once
 
-#include "API/Advanced/GBuffer.h"
+#include "API/advanced/GBuffer.h"
 #include <GL/glew.h>
 
-namespace OpenGL::Advanced {
-	class GBuffer_OpenGL : public API::Advanced::GBuffer
+namespace OpenGL::Advanced
+{
+	class GBuffer_OpenGL final : public API::Advanced::GBuffer
 	{
 	public:
 		GBuffer_OpenGL(unsigned int width, unsigned int height);
-		~GBuffer_OpenGL() = default;
+		~GBuffer_OpenGL() override = default;
 
-		int GetInternalId() const override { return IdGBuffer; }
+		[[nodiscard]] int GetInternalId() const override { return (int)IdGBuffer; }
 
 		void Bind() const override;
 		void BindAndClear() override;
@@ -20,24 +21,28 @@ namespace OpenGL::Advanced {
 
 		void BindTexture(unsigned int slot, unsigned int index) override;
 		void BindTexture(const std::string& identifier, unsigned int index) override;
-		void BindTextures(unsigned int startSlot = 0) override;
+		void BindTextures(unsigned int startSlot) override;
 
 		unsigned int GetTargetInternalId(const std::string& identifier) override;
 		unsigned int GetTargetBoundTextureSlot(const std::string& identifier) override;
-		const std::string GetTargetIdentifier(unsigned int internalId) override;
+		std::string GetTargetIdentifier(unsigned int internalId) override;
 
-		unsigned int AddRenderTarget(const std::string& identifier, unsigned int width, unsigned int height, unsigned int components, API::Core::BufferDataType datatype, API::Core::WrapMethod wrap = API::Core::WrapMethod::CLAMP_TO_EDGE, void* data = nullptr) override;
-		unsigned int AddRenderTarget(const std::string& identifier, unsigned int components, API::Core::BufferDataType datatype, API::Core::WrapMethod wrap = API::Core::WrapMethod::CLAMP_TO_EDGE, void* data = nullptr) override;
+		unsigned int AddRenderTarget(const std::string& identifier, unsigned int width, unsigned int height,
+		                             unsigned int components, API::Core::BufferDataType datatype,
+		                             API::Core::WrapMethod wrap, void* data) override;
+		unsigned int AddRenderTarget(const std::string& identifier, unsigned int components,
+		                             API::Core::BufferDataType datatype,
+		                             API::Core::WrapMethod wrap, void* data = nullptr) override;
 
-		unsigned int AddDepthTarget(unsigned int width, unsigned int height, API::Core::DepthBufferType type = API::Core::DepthBufferType::WRITE_ONLY) override;
-		unsigned int AddDepthTarget(API::Core::DepthBufferType type = API::Core::DepthBufferType::WRITE_ONLY) override;
+		unsigned int AddDepthTarget(unsigned int width, unsigned int height, API::Core::DepthBufferType type) override;
+		unsigned int AddDepthTarget(API::Core::DepthBufferType type) override;
 
 		unsigned int AddStencilTarget(unsigned int width, unsigned int height) override;
 		unsigned int AddStencilTarget() override;
 
 		bool Validate() override;
 
-		inline size_t AttachementCount() const override { return Targets.size(); }
+		[[nodiscard]] inline size_t AttachmentCount() const override { return Targets.size(); }
 
 	private:
 		struct TextureFormat
@@ -47,20 +52,21 @@ namespace OpenGL::Advanced {
 			GLenum Type;
 		};
 
-		TextureFormat GetTextureFormat(unsigned int components, API::Core::BufferDataType datatype);
+		static TextureFormat GetTextureFormat(unsigned int components, API::Core::BufferDataType datatype);
 
 	private:
-		struct InternalTargetData {
+		struct InternalTargetData
+		{
 			bool IsBound;
 			unsigned int BoundSlot;
 			GLuint InternalId;
-		};;
+		};
 
 		unsigned int Width, Height;
 
-		unsigned int IdGBuffer;
+		unsigned int IdGBuffer = 0;
 		std::vector<std::pair<std::string, InternalTargetData>> Targets;
-		unsigned int DepthTarget;
-		unsigned int StencilTarget;
+		unsigned int DepthTarget = 0;
+		unsigned int StencilTarget = 0;
 	};
 }

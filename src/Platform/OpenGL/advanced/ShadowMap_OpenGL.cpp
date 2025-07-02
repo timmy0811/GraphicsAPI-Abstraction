@@ -11,9 +11,7 @@ OpenGL::Advanced::ShadowMap_OpenGL::ShadowMap_OpenGL(const glm::ivec2& size)
 	Init(size);
 }
 
-OpenGL::Advanced::ShadowMap_OpenGL::~ShadowMap_OpenGL()
-{
-}
+OpenGL::Advanced::ShadowMap_OpenGL::~ShadowMap_OpenGL() = default;
 
 bool OpenGL::Advanced::ShadowMap_OpenGL::Init(const glm::ivec2& size)
 {
@@ -24,7 +22,7 @@ bool OpenGL::Advanced::ShadowMap_OpenGL::Init(const glm::ivec2& size)
 
 	GLCall(glGenTextures(1, &m_IdDepthBuffer));
 	GLCall(glBindTexture(GL_TEXTURE_2D, m_IdDepthBuffer));
-	GLCall(glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, m_Width, m_Height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL));
+	GLCall(glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, m_Width, m_Height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, nullptr));
 
 #ifdef FILTER_SHADOW
 	GLCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE));
@@ -48,7 +46,7 @@ bool OpenGL::Advanced::ShadowMap_OpenGL::Init(const glm::ivec2& size)
 	GLCall(glDrawBuffer(GL_NONE));
 	GLCall(glReadBuffer(GL_NONE));
 
-	GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+	const GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
 
 	if (status != GL_FRAMEBUFFER_COMPLETE) {
 		std::cout << "[OpenGL Error] (" << std::to_string(status) << ")" << std::endl;

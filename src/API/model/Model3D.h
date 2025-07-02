@@ -5,17 +5,17 @@
 
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
-#include <assimp/postprocess.h>
 
 #include "Mesh.h"
 
 // TODO: Use Factory Create for Core Features
 
-namespace API::Model {
+namespace API::Model
+{
 	class Model3D
 	{
 	public:
-		Model3D(const char* path);
+		explicit Model3D(const char* path);
 		~Model3D();
 
 		void Draw(Core::Shader& shader);
@@ -27,8 +27,8 @@ namespace API::Model {
 		std::vector<Texture::Texture*> m_LoadedTextures;
 
 		void Load(const std::string& path);
-		void ProcessNode(aiNode* node, const aiScene* scene);
+		void ProcessNode(const aiNode* node, const aiScene* scene);
 		Mesh ProcessMesh(aiMesh* mesh, const aiScene* scene);
-		std::vector<Texture::Texture*> LoadMaterialTextures(aiMaterial* mat, aiTextureType type);
+		std::vector<Texture::Texture*> LoadMaterialTextures(const aiMaterial* mat, aiTextureType type);
 	};
 }

@@ -1,10 +1,11 @@
 #include "glpch.h"
 #include "GBuffer_OpenGL.h"
 
+#include "Debug/Debug.h"
 #include "Debug/Log.h"
 
-OpenGL::Advanced::GBuffer_OpenGL::GBuffer_OpenGL(unsigned int width, unsigned int height)
-	: Width(width), Height(height)
+OpenGL::Advanced::GBuffer_OpenGL::GBuffer_OpenGL(const unsigned int width, const unsigned int height)
+	: Width(width), Height(height), DepthTarget(-1), StencilTarget(-1)
 {
 	GLCall(glGenFramebuffers(1, &IdGBuffer));
 	GLCall(glBindFramebuffer(GL_FRAMEBUFFER, IdGBuffer));
@@ -28,13 +29,13 @@ void OpenGL::Advanced::GBuffer_OpenGL::Unbind()
 	GLCall(glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0));
 }
 
-void OpenGL::Advanced::GBuffer_OpenGL::BindDepthTexture(unsigned int slot)
+void OpenGL::Advanced::GBuffer_OpenGL::BindDepthTexture(const unsigned int slot)
 {
 	GLCall(glActiveTexture(GL_TEXTURE0 + slot));
 	GLCall(glBindTexture(GL_TEXTURE_2D, DepthTarget));
 }
 
-void OpenGL::Advanced::GBuffer_OpenGL::BindTexture(unsigned int slot, unsigned int index)
+void OpenGL::Advanced::GBuffer_OpenGL::BindTexture(const unsigned int slot, const unsigned int index)
 {
 	GLCall(glActiveTexture(GL_TEXTURE0 + slot));
 	GLCall(glBindTexture(GL_TEXTURE_2D, Targets[index].second.InternalId));
@@ -42,7 +43,7 @@ void OpenGL::Advanced::GBuffer_OpenGL::BindTexture(unsigned int slot, unsigned i
 	Targets[index].second.IsBound = true;
 }
 
-void OpenGL::Advanced::GBuffer_OpenGL::BindTexture(const std::string& identifier, unsigned int index)
+void OpenGL::Advanced::GBuffer_OpenGL::BindTexture(const std::string& identifier, const unsigned int index)
 {
 	GLCall(glActiveTexture(GL_TEXTURE0 + index));
 	GLCall(glBindTexture(GL_TEXTURE_2D, GetTargetInternalId(identifier)));
@@ -50,9 +51,10 @@ void OpenGL::Advanced::GBuffer_OpenGL::BindTexture(const std::string& identifier
 	Targets[index].second.IsBound = true;
 }
 
-void OpenGL::Advanced::GBuffer_OpenGL::BindTextures(unsigned int startSlot)
+void OpenGL::Advanced::GBuffer_OpenGL::BindTextures(const unsigned int startSlot)
 {
-	for (GLuint i = 0; i < Targets.size(); i++) {
+	for (GLuint i = 0; i < Targets.size(); i++)
+	{
 		GLCall(glActiveTexture(GL_TEXTURE0 + startSlot + i));
 		GLCall(glBindTexture(GL_TEXTURE_2D, Targets[i].second.InternalId));
 		Targets[i].second.BoundSlot = startSlot + i;
@@ -62,9 +64,11 @@ void OpenGL::Advanced::GBuffer_OpenGL::BindTextures(unsigned int startSlot)
 
 unsigned int OpenGL::Advanced::GBuffer_OpenGL::GetTargetInternalId(const std::string& identifier)
 {
-	for (const auto& target : Targets) {
-		if (target.first == identifier) {
-			return target.second.InternalId;
+	for (const auto& [fst, snd] : Targets)
+	{
+		if (fst == identifier)
+		{
+			return snd.InternalId;
 		}
 	}
 
@@ -74,13 +78,16 @@ unsigned int OpenGL::Advanced::GBuffer_OpenGL::GetTargetInternalId(const std::st
 
 unsigned int OpenGL::Advanced::GBuffer_OpenGL::GetTargetBoundTextureSlot(const std::string& identifier)
 {
-	for (const auto& target : Targets) {
-		if (target.first == identifier) {
-			if (!target.second.IsBound) {
+	for (const auto& [fst, snd] : Targets)
+	{
+		if (fst == identifier)
+		{
+			if (!snd.IsBound)
+			{
 				LOG_GL_WARN("Target not yet bound to a slot: " + identifier + ". Returning 0");
 				return 0;
 			}
-			return target.second.BoundSlot;
+			return snd.BoundSlot;
 		}
 	}
 
@@ -88,11 +95,13 @@ unsigned int OpenGL::Advanced::GBuffer_OpenGL::GetTargetBoundTextureSlot(const s
 	return 0;
 }
 
-const std::string OpenGL::Advanced::GBuffer_OpenGL::GetTargetIdentifier(unsigned int internalId)
+std::string OpenGL::Advanced::GBuffer_OpenGL::GetTargetIdentifier(const unsigned int internalId)
 {
-	for (const auto& target : Targets) {
-		if (target.second.InternalId == internalId) {
-			return target.first;
+	for (const auto& [fst, snd] : Targets)
+	{
+		if (snd.InternalId == internalId)
+		{
+			return fst;
 		}
 	}
 
@@ -100,9 +109,10 @@ const std::string OpenGL::Advanced::GBuffer_OpenGL::GetTargetIdentifier(unsigned
 	return "";
 }
 
-unsigned int OpenGL::Advanced::GBuffer_OpenGL::AddRenderTarget(const std::string& identifier, unsigned int width, unsigned int height, unsigned int components, API::Core::BufferDataType datatype, API::Core::WrapMethod wrap, void* data)
+unsigned int OpenGL::Advanced::GBuffer_OpenGL::AddRenderTarget(const std::string& identifier, const unsigned int width, const unsigned int height, const unsigned int components,
+                                                               const API::Core::BufferDataType datatype, const API::Core::WrapMethod wrap, void* data)
 {
-	Targets.push_back({ identifier, {0, 0} });
+	Targets.push_back({identifier, {0, 0}});
 
 	GLCall(glGenTextures(1, &Targets.back().second.InternalId));
 	GLCall(glBindTexture(GL_TEXTURE_2D, Targets.back().second.InternalId));
@@ -126,26 +136,27 @@ unsigned int OpenGL::Advanced::GBuffer_OpenGL::AddRenderTarget(const std::string
 	return Targets.back().second.InternalId;
 }
 
-unsigned int OpenGL::Advanced::GBuffer_OpenGL::AddRenderTarget(const std::string& identifier, unsigned int components, API::Core::BufferDataType datatype, API::Core::WrapMethod wrap, void* data)
+unsigned int OpenGL::Advanced::GBuffer_OpenGL::AddRenderTarget(const std::string& identifier, const unsigned int components, const API::Core::BufferDataType datatype,
+                                                               const API::Core::WrapMethod wrap, void* data)
 {
 	return AddRenderTarget(identifier, Width, Height, components, datatype, wrap, data);
 }
 
-unsigned int OpenGL::Advanced::GBuffer_OpenGL::AddDepthTarget(unsigned int width, unsigned int height, API::Core::DepthBufferType type)
+unsigned int OpenGL::Advanced::GBuffer_OpenGL::AddDepthTarget(const unsigned int width, const unsigned int height, const API::Core::DepthBufferType type)
 {
 	switch (type)
 	{
 	case API::Core::DepthBufferType::WRITE_ONLY:
 		glGenRenderbuffers(1, &DepthTarget);
 		glBindRenderbuffer(GL_RENDERBUFFER, DepthTarget);
-		glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, width, height);
+		glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, (int)width, (int)height);
 		glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, DepthTarget);
 
 		break;
 	case API::Core::DepthBufferType::WRITE_READ:
 		GLCall(glGenTextures(1, &DepthTarget));
 		GLCall(glBindTexture(GL_TEXTURE_2D, DepthTarget));
-		GLCall(glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, width, height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL));
+		GLCall(glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, (int)width, (int)height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, nullptr));
 
 		GLCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST));
 		GLCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST));
@@ -167,16 +178,16 @@ unsigned int OpenGL::Advanced::GBuffer_OpenGL::AddDepthTarget(unsigned int width
 	return DepthTarget;
 }
 
-unsigned int OpenGL::Advanced::GBuffer_OpenGL::AddDepthTarget(API::Core::DepthBufferType type)
+unsigned int OpenGL::Advanced::GBuffer_OpenGL::AddDepthTarget(const API::Core::DepthBufferType type)
 {
 	return AddDepthTarget(Width, Height, type);
 }
 
-unsigned int OpenGL::Advanced::GBuffer_OpenGL::AddStencilTarget(unsigned int width, unsigned int height)
+unsigned int OpenGL::Advanced::GBuffer_OpenGL::AddStencilTarget(const unsigned int width, const unsigned int height)
 {
 	glGenTextures(1, &StencilTarget);
 	glBindTexture(GL_TEXTURE_2D, StencilTarget);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH24_STENCIL8, width, height, 0, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8, NULL);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH24_STENCIL8, width, height, 0, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8, nullptr);
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, StencilTarget, 0);
 
 	return StencilTarget;
@@ -190,9 +201,10 @@ unsigned int OpenGL::Advanced::GBuffer_OpenGL::AddStencilTarget()
 bool OpenGL::Advanced::GBuffer_OpenGL::Validate()
 {
 	GLCall(glBindFramebuffer(GL_FRAMEBUFFER, IdGBuffer));
-	GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+	const GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
 
-	if (status != GL_FRAMEBUFFER_COMPLETE) {
+	if (status != GL_FRAMEBUFFER_COMPLETE)
+	{
 		LOG_GL_ERROR("Could not validate gbuffer.");
 		return false;
 	}
@@ -201,90 +213,69 @@ bool OpenGL::Advanced::GBuffer_OpenGL::Validate()
 	return true;
 }
 
-OpenGL::Advanced::GBuffer_OpenGL::TextureFormat OpenGL::Advanced::GBuffer_OpenGL::GetTextureFormat(unsigned int components, API::Core::BufferDataType datatype)
+OpenGL::Advanced::GBuffer_OpenGL::TextureFormat OpenGL::Advanced::GBuffer_OpenGL::GetTextureFormat(const unsigned int components, const API::Core::BufferDataType datatype)
 {
-	TextureFormat format;
+	TextureFormat format{};
 
-	switch (components) {
-	case 1: format.Format = GL_RED; break;
-	case 2: format.Format = GL_RG; break;
-	case 3: format.Format = GL_RGB; break;
-	case 4: format.Format = GL_RGBA; break;
+	switch (components)
+	{
+	case 1: format.Format = GL_RED;
+		break;
+	case 2: format.Format = GL_RG;
+		break;
+	case 3: format.Format = GL_RGB;
+		break;
+	case 4: format.Format = GL_RGBA;
+		break;
 	default:
 		LOG_GL_ERROR("Invalid component count: must be 1, 2, 3, or 4.");
 		return {};
 	}
 
-	switch (datatype) {
+	switch (datatype)
+	{
 	case API::Core::BufferDataType::_FLOAT:
-		format.InternalFormat = (components == 1) ? GL_R32F :
-			(components == 2) ? GL_RG32F :
-			(components == 3) ? GL_RGB32F :
-			GL_RGBA32F;
+		format.InternalFormat = (components == 1) ? GL_R32F : (components == 2) ? GL_RG32F : (components == 3) ? GL_RGB32F : GL_RGBA32F;
 		format.Type = GL_FLOAT;
 		break;
 
 	case API::Core::BufferDataType::_FLOAT16:
-		format.InternalFormat = (components == 1) ? GL_R16F :
-			(components == 2) ? GL_RG16F :
-			(components == 3) ? GL_RGB16F :
-			GL_RGBA16F;
+		format.InternalFormat = (components == 1) ? GL_R16F : (components == 2) ? GL_RG16F : (components == 3) ? GL_RGB16F : GL_RGBA16F;
 		format.Type = GL_HALF_FLOAT;
 		break;
 
 	case API::Core::BufferDataType::_DOUBLE:
-		format.InternalFormat = (components == 1) ? GL_R32F :
-			(components == 2) ? GL_RG32F :
-			(components == 3) ? GL_RGB32F :
-			GL_RGBA32F;
+		format.InternalFormat = (components == 1) ? GL_R32F : (components == 2) ? GL_RG32F : (components == 3) ? GL_RGB32F : GL_RGBA32F;
 		format.Type = GL_DOUBLE;
 		break;
 
 	case API::Core::BufferDataType::_BYTE_UNSIGNED:
-		format.InternalFormat = (components == 1) ? GL_R8 :
-			(components == 2) ? GL_RG8 :
-			(components == 3) ? GL_RGB8 :
-			GL_RGBA8;
+		format.InternalFormat = (components == 1) ? GL_R8 : (components == 2) ? GL_RG8 : (components == 3) ? GL_RGB8 : GL_RGBA8;
 		format.Type = GL_UNSIGNED_BYTE;
 		break;
 
 	case API::Core::BufferDataType::_BYTE:
-		format.InternalFormat = (components == 1) ? GL_R8_SNORM :
-			(components == 2) ? GL_RG8_SNORM :
-			(components == 3) ? GL_RGB8_SNORM :
-			GL_RGBA8_SNORM;
+		format.InternalFormat = (components == 1) ? GL_R8_SNORM : (components == 2) ? GL_RG8_SNORM : (components == 3) ? GL_RGB8_SNORM : GL_RGBA8_SNORM;
 		format.Type = GL_BYTE;
 		break;
 
 	case API::Core::BufferDataType::_SHORT:
-		format.InternalFormat = (components == 1) ? GL_R16_SNORM :
-			(components == 2) ? GL_RG16_SNORM :
-			(components == 3) ? GL_RGB16_SNORM :
-			GL_RGBA16_SNORM;
+		format.InternalFormat = (components == 1) ? GL_R16_SNORM : (components == 2) ? GL_RG16_SNORM : (components == 3) ? GL_RGB16_SNORM : GL_RGBA16_SNORM;
 		format.Type = GL_SHORT;
 		break;
 
 	case API::Core::BufferDataType::_SHORT_UNSIGNED:
-		format.InternalFormat = (components == 1) ? GL_R16 :
-			(components == 2) ? GL_RG16 :
-			(components == 3) ? GL_RGB16 :
-			GL_RGBA16;
+		format.InternalFormat = (components == 1) ? GL_R16 : (components == 2) ? GL_RG16 : (components == 3) ? GL_RGB16 : GL_RGBA16;
 		format.Type = GL_UNSIGNED_SHORT;
 		break;
 
 	case API::Core::BufferDataType::_INT:
-		format.InternalFormat = (components == 1) ? GL_R32I :
-			(components == 2) ? GL_RG32I :
-			(components == 3) ? GL_RGB32I :
-			GL_RGBA32I;
+		format.InternalFormat = (components == 1) ? GL_R32I : (components == 2) ? GL_RG32I : (components == 3) ? GL_RGB32I : GL_RGBA32I;
 		format.Type = GL_INT;
 		break;
 
 	case API::Core::BufferDataType::_INT_UNSIGNED:
-		format.InternalFormat = (components == 1) ? GL_R32UI :
-			(components == 2) ? GL_RG32UI :
-			(components == 3) ? GL_RGB32UI :
-			GL_RGBA32UI;
+		format.InternalFormat = (components == 1) ? GL_R32UI : (components == 2) ? GL_RG32UI : (components == 3) ? GL_RGB32UI : GL_RGBA32UI;
 		format.Type = GL_UNSIGNED_INT;
 		break;
 

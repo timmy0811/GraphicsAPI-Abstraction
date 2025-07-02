@@ -15,7 +15,7 @@ namespace API::Core {
 		virtual void Bind() const = 0;
 		virtual void Unbind() const = 0;
 
-		virtual inline size_t GetSize() const { return m_DataPtr; };
+		[[nodiscard]] virtual inline size_t GetSize() const { return m_DataPtr; }
 
 		static VertexBuffer* Create(const void* data, unsigned int size);
 		static VertexBuffer* Create(unsigned int count, size_t elementSize);
@@ -23,6 +23,6 @@ namespace API::Core {
 
 	protected:
 		size_t m_DataPtr = 0;
-		size_t m_BufferSize;
+		size_t m_BufferSize{};
 	};
 }

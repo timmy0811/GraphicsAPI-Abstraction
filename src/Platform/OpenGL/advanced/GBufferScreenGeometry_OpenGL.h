@@ -1,8 +1,6 @@
 #pragma once
 
-#include <GL/glew.h>
-
-#include "API/Advanced/GBufferScreenGeometry.h"
+#include "API/advanced/GBufferScreenGeometry.h"
 
 #include <API/core/IndexBuffer.h>
 #include <API/core/Shader.h>
@@ -10,15 +8,18 @@
 #include <API/core/VertexBuffer.h>
 #include <API/core/VertexBufferLayout.h>
 
-namespace OpenGL::Advanced {
-	class GBufferScreenGeometry_OpenGL : public API::Advanced::GBufferScreenGeometry
+#include "API/advanced/GBufferScreenGeometry.h"
+
+namespace OpenGL::Advanced
+{
+	class GBufferScreenGeometry_OpenGL final : public API::Advanced::GBufferScreenGeometry
 	{
 	public:
 		GBufferScreenGeometry_OpenGL(unsigned int width, unsigned int height);
-		~GBufferScreenGeometry_OpenGL() = default;
+		~GBufferScreenGeometry_OpenGL() override = default;
 
 		void Draw(API::Core::Shader* shadingPassShader) override;
-		void Resize(unsigned int width, unsigned int height)  override;
+		void Resize(unsigned int width, unsigned int height) override;
 
 	private:
 		unsigned int Width, Height;
@@ -28,6 +29,6 @@ namespace OpenGL::Advanced {
 		std::unique_ptr<API::Core::VertexBufferLayout> VBL;
 		std::unique_ptr<API::Core::VertexArray> VAO;
 
-		glm::mat4 ProjectionMat;
+		glm::mat4 ProjectionMat{};
 	};
 }

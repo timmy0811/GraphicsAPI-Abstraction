@@ -1,16 +1,15 @@
 #pragma once
 
 #include "vendor/glm/glm.hpp"
-#include "Debug/Debug.h"
-
-#include <vector>
 
 #include <GL/glew.h>
 
 #define MAX_BUF 8
 
-namespace API::Core {
-	enum BufferDataType {
+namespace API::Core
+{
+	enum BufferDataType
+	{
 		_FLOAT = 0x1406,
 		_FLOAT16 = 1,
 		_DOUBLE = 0x140A,
@@ -23,7 +22,8 @@ namespace API::Core {
 		_NONE = 0
 	};
 
-	enum WrapMethod {
+	enum WrapMethod
+	{
 		NEAREST = 0x2600,
 		LINEAR = 0x2601,
 		CLAMP_TO_EDGE = 0x812F,
@@ -43,7 +43,8 @@ namespace API::Core {
 	class Framebuffer
 	{
 	public:
-		enum BufferFormat {
+		enum BufferFormat
+		{
 			RGBA32F = 0x8814,
 			RGB32F = 0x8815,
 			RG32F = 0x8230,
@@ -100,29 +101,34 @@ namespace API::Core {
 
 		virtual void Bind(unsigned int Framebuffer) = 0;
 
-		virtual int GetInternalId() const = 0;
+		[[nodiscard]] virtual int GetInternalId() const = 0;
 
 		virtual void Bind() const = 0;
 		virtual void BindAndClear() = 0;
 		virtual void Unbind() = 0;
 
-		virtual void BindTextures(const unsigned int startSlot = 0) = 0;
-		virtual void BindTexture(int index, const unsigned int startSlot = 0) = 0;
-		virtual unsigned int BindDepthTexture(const unsigned int slot) = 0;
+		virtual void BindTextures(unsigned int startSlot = 0) = 0;
+		virtual void BindTexture(int index, unsigned int startSlot = 0) = 0;
+		virtual unsigned int BindDepthTexture(unsigned int slot) = 0;
 
-		virtual bool PushColorAttribute(const char channel = 3, BufferDataType dataType = BufferDataType::_FLOAT, const void* data = nullptr) = 0;
+		virtual bool PushColorAttribute(char channel = 3, BufferDataType dataType = _FLOAT, const void* data = nullptr) = 0;
 		virtual bool PushColorAttribute(unsigned int internalFormat = 0x881A, unsigned int format = 0x1908, unsigned int dataType = 0x1406, const void* data = nullptr) = 0;
 
 		virtual inline unsigned int GetColorAttachmentTextureID(unsigned int index) = 0;
 
-		virtual inline size_t AttachementCount() const = 0;
-		virtual inline bool Validate() const = 0;
-		virtual inline void Resize(const glm::ivec2& size) { m_Width = size.x; m_Height = size.y; }
+		[[nodiscard]] virtual inline size_t AttachmentCount() const = 0;
+		[[nodiscard]] virtual inline bool Validate() const = 0;
+
+		virtual inline void Resize(const glm::ivec2& size)
+		{
+			m_Width = size.x;
+			m_Height = size.y;
+		}
 
 		static Framebuffer* Create(const glm::ivec2& size, bool attachDepth, DepthBufferType depthType = DepthBufferType::WRITE_ONLY);
 		static Framebuffer* Create(const glm::ivec2& size);
 
 	protected:
-		unsigned int m_Width, m_Height;
+		unsigned int m_Width{}, m_Height{};
 	};
 }

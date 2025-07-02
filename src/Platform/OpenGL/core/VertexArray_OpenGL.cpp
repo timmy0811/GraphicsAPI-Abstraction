@@ -14,14 +14,16 @@ OpenGL::Core::VertexArray_OpenGL::~VertexArray_OpenGL()
 	GLCall(glDeleteVertexArrays(1, &m_RendererID));
 }
 
-void OpenGL::Core::VertexArray_OpenGL::AddBuffer(const API::Core::VertexBuffer& vb, const API::Core::VertexBufferLayout& layout)
+void OpenGL::Core::VertexArray_OpenGL::AddBuffer(const API::Core::VertexBuffer& vb,
+                                                 const API::Core::VertexBufferLayout& layout)
 {
 	Bind();
 	vb.Bind();
 	AddBuffer(layout);
 }
 
-void OpenGL::Core::VertexArray_OpenGL::AddBuffer(const API::Core::Buffer& vb, const API::Core::VertexBufferLayout& layout)
+void OpenGL::Core::VertexArray_OpenGL::AddBuffer(const API::Core::Buffer& vb,
+                                                 const API::Core::VertexBufferLayout& layout)
 {
 	Bind();
 	vb.Bind();
@@ -43,12 +45,15 @@ void OpenGL::Core::VertexArray_OpenGL::AddBuffer(const API::Core::VertexBufferLa
 	const auto& elements = layout.GetElements();
 	unsigned int offset = 0;
 
-	for (int i = 0; i < elements.size(); i++) {
+	for (int i = 0; i < elements.size(); i++)
+	{
 		const auto& element = elements[i];
 		GLCall(glEnableVertexAttribArray(i));
 #pragma warning(push)
 #pragma warning(disable:4312)
-		GLCall(glVertexAttribPointer(i, element.components, API::Core::VertexBufferElement::GetAPIDataType(element.type), element.normalized, layout.GetStride(), (const void*)offset));
+		GLCall(
+			glVertexAttribPointer(i, element.components, API::Core::VertexBufferElement::GetAPIDataType(element.type),
+				element.normalized, layout.GetStride(), reinterpret_cast<const void*>(offset)));
 #pragma warning(pop)
 		offset += API::Core::VertexBufferLayout::ShaderDataTypeSize(element.type);
 	}

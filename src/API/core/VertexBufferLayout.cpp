@@ -7,10 +7,10 @@
 
 API::Core::VertexBufferLayout* API::Core::VertexBufferLayout::Create()
 {
-	return new API::Core::VertexBufferLayout();
+	return new VertexBufferLayout();
 }
 
-int API::Core::VertexBufferElement::GetAPIDataType(ShaderDataType dataType)
+int API::Core::VertexBufferElement::GetAPIDataType(const ShaderDataType dataType)
 {
 	switch (DefaultRendererContext::GetAPI()) {
 	case RendererAPI::API_ENUM::None:
@@ -30,6 +30,7 @@ int API::Core::VertexBufferElement::GetAPIDataType(ShaderDataType dataType)
 		case ShaderDataType::Int3:     return GL_INT;
 		case ShaderDataType::Int4:     return GL_INT;
 		case ShaderDataType::Bool:     return GL_BOOL;
+		default: return GL_NONE;
 		}
 		API_ASSERT(false, "Unknown Buffer Element Type.");
 	}

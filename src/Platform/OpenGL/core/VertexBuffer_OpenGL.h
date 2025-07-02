@@ -1,15 +1,15 @@
 #pragma once
 
-#include "Debug/Debug.h"
-
 #include "API/core/VertexBuffer.h"
 
-namespace OpenGL::Core {
-	class VertexBuffer_OpenGL : public API::Core::VertexBuffer {
+namespace OpenGL::Core
+{
+	class VertexBuffer_OpenGL final : public API::Core::VertexBuffer
+	{
 	public:
 		VertexBuffer_OpenGL(const void* data, unsigned int size);
 		VertexBuffer_OpenGL(unsigned int count, size_t elementSize);
-		VertexBuffer_OpenGL(size_t capacity);
+		explicit VertexBuffer_OpenGL(size_t capacity);
 		~VertexBuffer_OpenGL() override;
 
 		int AddVertexData(const void* data, int size, int offset) override;
@@ -21,6 +21,6 @@ namespace OpenGL::Core {
 		void Unbind() const override;
 
 	private:
-		unsigned int m_RendererID;
+		unsigned int m_RendererID = 0;
 	};
 }

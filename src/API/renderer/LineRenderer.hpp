@@ -16,8 +16,10 @@
 #include <memory>
 #include <string>
 
-namespace API::Misc {
-	class LineRenderer {
+namespace API::Misc
+{
+	class LineRenderer
+	{
 	public:
 		std::shared_ptr<Core::VertexBuffer> vb;
 		std::shared_ptr<Core::IndexBuffer> ib;
@@ -26,11 +28,13 @@ namespace API::Misc {
 
 		std::shared_ptr<Core::Shader> shader;
 
-		LineRenderer(int count, glm::vec4 color, const std::string& shaderVert, const std::string& shaderFrag)
-			: shader(Core::Shader::Create(shaderVert, shaderFrag)) {
-			unsigned int* indices = new unsigned int[count];
+		LineRenderer(const int count, const glm::vec4 color, const std::string& shaderVert, const std::string& shaderFrag)
+			: shader(Core::Shader::Create(shaderVert, shaderFrag))
+		{
+			auto indices = new unsigned int[count];
 
-			for (int i = 0; i < count; i++) {
+			for (int i = 0; i < count; i++)
+			{
 				indices[i] = i;
 			}
 
@@ -40,7 +44,7 @@ namespace API::Misc {
 			delete[] indices;
 
 			vbLayout.reset(Core::VertexBufferLayout::Create());
-			vbLayout->Push(API::Core::ShaderDataType::Float3);
+			vbLayout->Push(Core::ShaderDataType::Float3);
 
 			va.reset(Core::VertexArray::Create());
 			va->AddBuffer(*vb, *vbLayout);
@@ -49,9 +53,12 @@ namespace API::Misc {
 			shader->SetUniform4f("u_Color", color.r, color.g, color.b, color.a);
 		}
 
-		~LineRenderer() {}
+		~LineRenderer()
+		{
+		}
 
-		inline void Draw() {
+		inline void Draw() const
+		{
 			GLCall(glLineWidth(3));
 			shader->Bind();
 			va->Bind();
@@ -59,7 +66,8 @@ namespace API::Misc {
 			Legacy::LegacyRenderer::Draw(*va, *ib, *shader, GL_LINES);
 		}
 
-		inline void DrawInstanced(const unsigned int count, const unsigned int instances) {
+		inline void DrawInstanced(const unsigned int count, const unsigned int instances) const
+		{
 			GLCall(glLineWidth(3));
 			Legacy::LegacyRenderer::Draw(*va, *ib, *shader, count, instances);
 		}

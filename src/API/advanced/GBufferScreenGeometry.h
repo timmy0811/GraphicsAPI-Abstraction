@@ -8,7 +8,7 @@ namespace API::Advanced {
 	public:
 		virtual ~GBufferScreenGeometry() = default;
 
-		virtual void Draw(API::Core::Shader* shadingPassShader) = 0;
+		virtual void Draw(Core::Shader* shadingPassShader) = 0;
 		virtual void Resize(unsigned int width, unsigned int height) = 0;
 
 		static GBufferScreenGeometry* Create(unsigned int width, unsigned int height);
