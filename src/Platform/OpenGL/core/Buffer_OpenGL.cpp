@@ -2,6 +2,7 @@
 #include "Buffer_OpenGL.h"
 
 #include "Debug/Debug.h"
+#include "GL/glew.h"
 
 OpenGL::Core::Buffer_OpenGL::Buffer_OpenGL(const BufferType type, const MemoryLayout layout, const void* data, const unsigned int size)
 {
@@ -79,6 +80,13 @@ void OpenGL::Core::Buffer_OpenGL::Empty()
 	Bind();
 	GLCall(glBufferSubData(this->type, 0, m_BufferSize, nullptr));
 	m_DataPtr = 0;
+}
+
+void OpenGL::Core::Buffer_OpenGL::EmptyPastOffset(const size_t offset)
+{
+	Bind();
+	GLCall(glBufferSubData(this->type, offset, m_BufferSize - offset, nullptr));
+	m_DataPtr = offset;
 }
 
 OpenGL::Core::Buffer_OpenGL::~Buffer_OpenGL()

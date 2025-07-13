@@ -21,6 +21,7 @@ namespace OpenGL::Core
 		void SetDataDynamic(const void* data, size_t size) override;
 
 		void Empty() override;
+		void EmptyPastOffset(size_t offset) override;
 
 		void Bind() const override;
 		void Unbind() const override;

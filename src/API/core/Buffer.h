@@ -33,6 +33,7 @@ namespace API::Core {
 		virtual void SetDataDynamic(const void* data, size_t size) = 0;
 
 		virtual void Empty() = 0;
+		virtual void EmptyPastOffset(size_t offset) = 0;
 
 		virtual void Bind() const = 0;
 		virtual void Unbind() const = 0;
