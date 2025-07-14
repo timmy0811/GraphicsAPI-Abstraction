@@ -53,6 +53,7 @@ namespace OpenGL::Advanced
 		};
 
 		static TextureFormat GetTextureFormat(unsigned int components, API::Core::BufferDataType datatype);
+		static inline int GetBoundFBO();
 
 	private:
 		struct InternalTargetData

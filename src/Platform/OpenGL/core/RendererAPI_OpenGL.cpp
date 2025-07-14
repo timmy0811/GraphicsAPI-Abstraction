@@ -104,43 +104,43 @@ void OpenGL::Core::RendererAPI_OpenGL::EnableAntiAliasing(const API::Core::AntiA
 
 void OpenGL::Core::RendererAPI_OpenGL::EnableStencilTestWithConstant(const unsigned int mask)
 {
-	glEnable(GL_STENCIL_TEST);
-	glStencilFunc(GL_ALWAYS, 1, mask);
-	glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+	GLCall(glEnable(GL_STENCIL_TEST));
+	GLCall(glStencilFunc(GL_ALWAYS, 1, mask));
+	GLCall(glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE));
 }
 
 void OpenGL::Core::RendererAPI_OpenGL::SetDefaultStencilTest()
 {
-	glStencilFunc(GL_EQUAL, 1, 0xFF);
-	glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
+	GLCall(glStencilFunc(GL_EQUAL, 1, 0xFF));
+	GLCall(glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP));
 }
 
 void OpenGL::Core::RendererAPI_OpenGL::CopyStencilBuffer(const unsigned int source, const unsigned dest, const int width, const int height)
 {
-	glBindFramebuffer(GL_READ_FRAMEBUFFER, source);
-	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, dest);
+	GLCall(glBindFramebuffer(GL_READ_FRAMEBUFFER, source));
+	GLCall(glBindFramebuffer(GL_DRAW_FRAMEBUFFER, dest));
 
-	glBlitFramebuffer(0, 0, width, height,
+	GLCall(glBlitFramebuffer(0, 0, width, height,
 	                  0, 0, width, height,
 	                  GL_STENCIL_BUFFER_BIT,
-	                  GL_NEAREST);
+	                  GL_NEAREST));
 
-	glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
-	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+	GLCall(glBindFramebuffer(GL_READ_FRAMEBUFFER, 0));
+	GLCall(glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0));
 }
 
 void OpenGL::Core::RendererAPI_OpenGL::CopyDepthBuffer(const unsigned int source, const unsigned dest, const int width, const int height)
 {
-	glBindFramebuffer(GL_READ_FRAMEBUFFER, source);
-	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, dest);
+	GLCall(glBindFramebuffer(GL_READ_FRAMEBUFFER, source));
+	GLCall(glBindFramebuffer(GL_DRAW_FRAMEBUFFER, dest));
 
-	glBlitFramebuffer(0, 0, width, height,
+	GLCall(glBlitFramebuffer(0, 0, width, height,
 	                  0, 0, width, height,
 	                  GL_DEPTH_BUFFER_BIT,
-	                  GL_NEAREST);
+	                  GL_NEAREST));
 
-	glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
-	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+	GLCall(glBindFramebuffer(GL_READ_FRAMEBUFFER, 0));
+	GLCall(glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0));
 }
 
 std::string OpenGL::Core::RendererAPI_OpenGL::GetAPIVer() const

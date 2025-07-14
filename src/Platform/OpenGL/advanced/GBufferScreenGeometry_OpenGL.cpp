@@ -41,9 +41,7 @@ void OpenGL::Advanced::GBufferScreenGeometry_OpenGL::Draw(API::Core::Shader* sha
 {
 	VAO->Bind();
 	IBO->Bind();
-
 	shadingPassShader->Bind();
-	shadingPassShader->SetUniformMat4f("u_Projection", ProjectionMat);
 
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
 }

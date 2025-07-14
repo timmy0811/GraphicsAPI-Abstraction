@@ -19,9 +19,21 @@ void OpenGL::Advanced::GBuffer_OpenGL::Bind() const
 
 void OpenGL::Advanced::GBuffer_OpenGL::BindAndClear()
 {
-	GLCall(glBindFramebuffer(GL_DRAW_FRAMEBUFFER, IdGBuffer));
+	if (GetBoundFBO() != IdGBuffer) {
+		GLCall(glBindFramebuffer(GL_DRAW_FRAMEBUFFER, IdGBuffer));
+	}
+
 	GLCall(glViewport(0, 0, Width, Height));
-	GLCall(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
+
+	GLbitfield clearMask = 0;
+	if (!Targets.empty()) clearMask |= GL_COLOR_BUFFER_BIT;
+	if (DepthTarget != -1) clearMask |= GL_DEPTH_BUFFER_BIT;
+	if (StencilTarget != -1) clearMask |= GL_STENCIL_BUFFER_BIT;
+
+	if (clearMask != 0)
+	{
+		GLCall(glClear(clearMask));
+	}
 }
 
 void OpenGL::Advanced::GBuffer_OpenGL::Unbind()
@@ -287,4 +299,11 @@ OpenGL::Advanced::GBuffer_OpenGL::TextureFormat OpenGL::Advanced::GBuffer_OpenGL
 	}
 
 	return format;
+}
+
+int OpenGL::Advanced::GBuffer_OpenGL::GetBoundFBO()
+{
+	GLint currentFBO;
+	GLCall(glGetIntegerv(GL_DRAW_FRAMEBUFFER_BINDING, &currentFBO));
+	return currentFBO;
 }
