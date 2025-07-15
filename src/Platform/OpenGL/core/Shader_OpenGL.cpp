@@ -315,6 +315,13 @@ std::string OpenGL::Core::Shader_OpenGL::StringFromPath(const std::string& path)
 				ss << line << "\n";
 		}
 	}
+
+	if (!isValid)
+	{
+		LOG_GL_ERROR("Shader file " + path + " does not contain a valid shader definition. Please ensure it starts with '//shader'.");
+		throw std::runtime_error("Failed compile shader: " + path);
+	}
+
 	return ss.str();
 }
 

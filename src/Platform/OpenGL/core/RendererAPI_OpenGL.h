@@ -12,6 +12,7 @@ namespace OpenGL::Core
 		void Clear() override;
 		void ClearStencilBuffer() override;
 
+		void IssueEmptyDrawCall(int instances) override;
 		void Draw(const std::shared_ptr<API::Core::VertexArray>& vertexArray, size_t size) override;
 		void DrawIndexed(const std::shared_ptr<API::Core::VertexArray>& vertexArray, const std::shared_ptr<API::Core::IndexBuffer>& indexBuffer) override;
 		void DrawIndexed(const std::shared_ptr<API::Core::VertexArray>& vertexArray, const std::shared_ptr<API::Core::Buffer>& indexBuffer) override;
@@ -22,6 +23,7 @@ namespace OpenGL::Core
 		void SetDepthTest(bool enabled) override;
 		void SetDepthTestFunc(API::Core::DepthFunction func) override;
 		void SetDepthTestRange(float min, float max) override;
+		void SetWireframeMode(bool enabled) override;
 
 		void SetBlend(bool enabled) override;
 		void SetBlendFunc(API::Core::BlendFunction source, API::Core::BlendFunction destination) override;

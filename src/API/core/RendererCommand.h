@@ -22,9 +22,19 @@ namespace API::Core
 			s_RendererAPI->Clear();
 		}
 
+		inline static void SetWireframeMode(const bool enabled)
+		{
+			s_RendererAPI->SetWireframeMode(enabled);
+		}
+
 		inline static void ClearStencilBuffer()
 		{
 			s_RendererAPI->ClearStencilBuffer();
+		}
+
+		inline static void IssueEmptyDrawCall(const int instances)
+		{
+			s_RendererAPI->IssueEmptyDrawCall(instances);
 		}
 
 		inline static void Draw(const std::shared_ptr<VertexArray>& vertexArray, const size_t size)

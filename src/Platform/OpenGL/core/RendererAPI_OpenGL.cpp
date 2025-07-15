@@ -25,6 +25,21 @@ void OpenGL::Core::RendererAPI_OpenGL::ClearStencilBuffer()
 	GLCall(glClear(GL_STENCIL_BUFFER_BIT));
 }
 
+void OpenGL::Core::RendererAPI_OpenGL::IssueEmptyDrawCall(const int instances)
+{
+	static bool initialized = false;
+	static GLuint emptyVAO;
+
+	if (!initialized)
+		GLCall(glGenVertexArrays(1, &emptyVAO));
+
+	GLCall(glBindVertexArray(emptyVAO));
+
+	GLCall(glDrawArrays(GL_TRIANGLES, 0, instances));
+
+	GLCall(glBindVertexArray(0));
+}
+
 void OpenGL::Core::RendererAPI_OpenGL::Draw(const std::shared_ptr<API::Core::VertexArray>& vertexArray, const size_t size)
 {
 	GLCall(glDrawArrays(GL_TRIANGLES, 0, (GLsizei)size));
@@ -67,6 +82,13 @@ void OpenGL::Core::RendererAPI_OpenGL::SetDepthTestRange(const float min, const 
 	GLCall(glDepthRange(min, max));
 }
 
+void OpenGL::Core::RendererAPI_OpenGL::SetWireframeMode(const bool enabled)
+{
+	GLCall(glPolygonMode(GL_FRONT_AND_BACK, enabled ? GL_LINE : GL_FILL));
+
+	glLineWidth(4.0f);
+}
+
 void OpenGL::Core::RendererAPI_OpenGL::SetBlend(const bool enabled)
 {
 	GLCall(enabled ? glEnable(GL_BLEND) : glDisable(GL_BLEND));
@@ -79,6 +101,12 @@ void OpenGL::Core::RendererAPI_OpenGL::SetBlendFunc(const API::Core::BlendFuncti
 
 void OpenGL::Core::RendererAPI_OpenGL::CullFace(const API::Core::Face mode)
 {
+	if (mode == API::Core::Face::None)
+	{
+		GLCall(glDisable(GL_CULL_FACE));
+		return;
+	}
+
 	GLCall(glEnable(GL_CULL_FACE));
 	GLCall(glCullFace(GLFaceCull(mode)));
 }

@@ -28,6 +28,7 @@ namespace API::Core
 		virtual void SetDepthTest(bool enabled) = 0;
 		virtual void SetDepthTestFunc(DepthFunction func) = 0;
 		virtual void SetDepthTestRange(float min, float max) = 0;
+		virtual void SetWireframeMode(bool enabled) = 0;
 
 		virtual void SetBlend(bool enabled) = 0;
 		virtual void SetBlendFunc(BlendFunction source, BlendFunction destination) = 0;
@@ -42,6 +43,7 @@ namespace API::Core
 		virtual void CopyStencilBuffer(unsigned int source, unsigned dest, int width, int height) = 0;
 		virtual void CopyDepthBuffer(unsigned int source, unsigned dest, int width, int height) = 0;
 
+		virtual void IssueEmptyDrawCall(int instances) = 0;
 		virtual void Draw(const std::shared_ptr<VertexArray>& vertexArray, size_t size) = 0;
 		virtual void DrawIndexed(const std::shared_ptr<VertexArray>& vertexArray, const std::shared_ptr<IndexBuffer>& indexBuffer) = 0;
 		virtual void DrawIndexed(const std::shared_ptr<VertexArray>& vertexArray, const std::shared_ptr<Buffer>& indexBuffer) = 0;
