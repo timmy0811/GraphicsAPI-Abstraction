@@ -234,8 +234,8 @@ void OpenGL::Core::Shader_OpenGL::SetUniformDirectionalLight(const std::string& 
 
 void OpenGL::Core::Shader_OpenGL::SetUniformMat4f(const std::string& name, const glm::mat4& mat)
 {
-	const int idex = GetUniformLocation(name);
-	GLCall(glUniformMatrix4fv(idex, 1, GL_FALSE, &mat[0][0]));
+	const int index = GetUniformLocation(name);
+	GLCall(glUniformMatrix4fv(index, 1, GL_FALSE, &mat[0][0]));
 }
 
 API::Core::Shader::ShaderProgramSource OpenGL::Core::Shader_OpenGL::ParseShader(
