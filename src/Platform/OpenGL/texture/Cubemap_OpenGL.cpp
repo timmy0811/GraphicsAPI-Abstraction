@@ -6,7 +6,7 @@
 
 #include "GL/glew.h"
 
-OpenGL::Texture::Cubemap_OpenGL::Cubemap_OpenGL(const std::string& dirPath, const std::string& fileFormat)
+OpenGL::Texture::Cubemap_OpenGL::Cubemap_OpenGL(const std::string& dirPath, const std::string& fileFormat, bool calcEnvironmentLight)
     :Cubemap(dirPath, fileFormat)
 {
     GLCall(glActiveTexture(GL_TEXTURE0));
@@ -18,6 +18,7 @@ OpenGL::Texture::Cubemap_OpenGL::Cubemap_OpenGL(const std::string& dirPath, cons
         "px", "nx", "py", "ny", "pz", "nz"
     };
 
+    float maxBrightness = 0.0f;
     int width, height, nrChannels, index = 0;
     for (const std::string& imgName : imgNames)
     {
@@ -43,6 +44,34 @@ OpenGL::Texture::Cubemap_OpenGL::Cubemap_OpenGL(const std::string& dirPath, cons
                 LOG_GL_ERROR("Unsupported channel count: {}", nrChannels);
                 stbi_image_free(data);
                 continue;
+            }
+
+            if (calcEnvironmentLight)
+            {
+                FaceColorResult faceColorResult;
+
+                float cutoffPercent = 0.0f;
+                if (imgName == "px" || imgName == "nz" || imgName == "px" || imgName == "ny")
+                {
+                    cutoffPercent = 0.45f;
+                }
+
+#define SAMPLES 300
+
+                faceColorResult.AverageColor = CalculateAverageColor(data, width, height, nrChannels, SAMPLES, cutoffPercent);
+                faceColorResult.BrightestPoint = FindBrightestPoint(data, width, height, nrChannels, SAMPLES, cutoffPercent);
+                faceColorResult.Brightness = CalculateBrightness(
+                    faceColorResult.AverageColor.r,
+                    faceColorResult.AverageColor.g,
+                    faceColorResult.AverageColor.b);
+
+                FaceColors[StringToFace(imgName)] = faceColorResult;
+
+                if (faceColorResult.Brightness > maxBrightness)
+                {
+                    maxBrightness = faceColorResult.Brightness;
+                    BrightestFace = StringToFace(imgName);
+                }
             }
 
             GLCall(glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + index++, 0, internalFormat, width, height, 0, format, GL_UNSIGNED_BYTE, data));

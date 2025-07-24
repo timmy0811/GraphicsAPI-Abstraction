@@ -7,7 +7,7 @@ namespace OpenGL::Texture
     class Cubemap_OpenGL final : public API::Texture::Cubemap
     {
     public:
-        Cubemap_OpenGL(const std::string& dirPath, const std::string& fileFormat);
+        Cubemap_OpenGL(const std::string& dirPath, const std::string& fileFormat, bool calcEnvironmentLight);
         ~Cubemap_OpenGL() override;
 
         void Unbind() override;
