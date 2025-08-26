@@ -44,6 +44,7 @@ int OpenGL::Core::Buffer_OpenGL::AddData(const void* data, const size_t size, co
 
 	Bind();
 	GLCall(glBufferSubData(this->type, offset, size, data));
+	m_DataPtr = std::max(m_DataPtr, (size_t)offset + size);
 
 	return offset;
 }
@@ -67,12 +68,14 @@ void OpenGL::Core::Buffer_OpenGL::SetData(const void* data, const size_t size)
 {
 	Bind();
 	GLCall(glBufferData(this->type, size, data, GL_STATIC_DRAW));
+	m_DataPtr = size;
 }
 
 void OpenGL::Core::Buffer_OpenGL::SetDataDynamic(const void* data, const size_t size)
 {
 	Bind();
 	GLCall(glBufferData(this->type, size, data, GL_DYNAMIC_DRAW));
+	m_DataPtr = size;
 }
 
 void OpenGL::Core::Buffer_OpenGL::Empty()
