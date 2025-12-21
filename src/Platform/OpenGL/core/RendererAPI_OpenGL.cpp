@@ -86,7 +86,7 @@ void OpenGL::Core::RendererAPI_OpenGL::SetWireframeMode(const bool enabled)
 {
 	GLCall(glPolygonMode(GL_FRONT_AND_BACK, enabled ? GL_LINE : GL_FILL));
 
-	glLineWidth(4.0f);
+	glLineWidth(2.0f);
 }
 
 void OpenGL::Core::RendererAPI_OpenGL::SetBlend(const bool enabled)

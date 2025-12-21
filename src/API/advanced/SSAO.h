@@ -16,7 +16,7 @@ namespace API::Advanced {
 		glm::vec3* getKernelAllocator() { return &m_Kernel[0]; }
 		virtual void BindNoiseTex(unsigned int slot) = 0;
 
-		static inline SSAO* Create();
+		static SSAO* Create();
 
 	protected:
 		std::vector<glm::vec3> m_Kernel;

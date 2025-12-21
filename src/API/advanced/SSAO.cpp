@@ -29,7 +29,7 @@ void API::Advanced::SSAO::GenerateSampleKernel(int samples)
 	}
 }
 
-inline API::Advanced::SSAO* API::Advanced::SSAO::Create()
+API::Advanced::SSAO* API::Advanced::SSAO::Create()
 {
 	switch (Core::DefaultRendererContext::GetAPI())
 	{

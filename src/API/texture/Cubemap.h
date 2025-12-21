@@ -40,6 +40,7 @@ namespace API::Texture
 
         [[nodiscard]] inline virtual Core::Shader* GetShader() const { return Shader; }
         [[nodiscard]] inline virtual const std::string& GetPath() const {return DirPath;};
+        [[nodiscard]] inline virtual const std::string& GetFileFormat() const {return FileFormat;};
 
         [[nodiscard]] virtual glm::vec3 GetCubemapAverageColor() const;
         [[nodiscard]] virtual glm::vec3 GetCubemapAverageColorExceptFaces(std::vector<Face>&& face) const;
@@ -48,7 +49,6 @@ namespace API::Texture
         [[nodiscard]] virtual float GetFaceBrightness(Face face) const;
 
         inline Face GetBrightestFace() const { return BrightestFace; }
-
 
         [[nodiscard]] inline int GetWidth() const { return Width; }
         [[nodiscard]] inline int GetHeight() const { return Height; }
