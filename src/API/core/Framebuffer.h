@@ -117,7 +117,7 @@ namespace API::Core
 		virtual inline unsigned int GetColorAttachmentTextureID(unsigned int index) = 0;
 
 		[[nodiscard]] virtual inline size_t AttachmentCount() const = 0;
-		[[nodiscard]] virtual inline bool Validate() const = 0;
+		virtual inline bool Validate() const = 0;
 
 		virtual inline void Resize(const glm::ivec2& size)
 		{

@@ -34,7 +34,7 @@ namespace OpenGL::Core
 		inline unsigned int GetColorAttachmentTextureID(unsigned int index) override;
 
 		[[nodiscard]] inline size_t AttachmentCount() const override { return m_Attachments.size(); }
-		[[nodiscard]] inline bool Validate() const override;
+		inline bool Validate() const override;
 
 	private:
 		struct TextureFormat
