@@ -98,7 +98,18 @@ OpenGL::Core::Framebuffer_OpenGL::Framebuffer_OpenGL(const glm::ivec2& size): m_
 unsigned int OpenGL::Core::Framebuffer_OpenGL::BindDepthTexture(const unsigned int slot)
 {
 	GLCall(glActiveTexture(GL_TEXTURE0 + slot));
-	GLCall(glBindTexture(GL_TEXTURE_2D, m_RBODepth));
+	// m_RBODepth can be a renderbuffer (WRITE_ONLY) or a texture (WRITE_READ)
+	if (glIsTexture(m_RBODepth) == GL_TRUE)
+	{
+		GLCall(glBindTexture(GL_TEXTURE_2D, m_RBODepth));
+	}
+	else
+	{
+		// Avoid GL errors by not binding renderbuffers as textures
+		GLCall(glBindTexture(GL_TEXTURE_2D, 0));
+		// Optional: log once per frame if needed
+		// std::cout << "[GL Warning] Attempted to bind depth renderbuffer as texture; skipped." << std::endl;
+	}
 	m_BoundPort = static_cast<int>(slot);
 	return m_BoundPort;
 }

@@ -43,8 +43,26 @@ void OpenGL::Advanced::GBuffer_OpenGL::Unbind()
 
 void OpenGL::Advanced::GBuffer_OpenGL::BindDepthTexture(const unsigned int slot)
 {
+	// In WRITE_ONLY mode the depth attachment is a renderbuffer, which cannot be bound as a texture.
+	// Guard against invalid binds that would cause GL_INVALID_OPERATION during resizes.
+	if (DepthTarget == (GLuint)-1) {
+		return;
+	}
+
 	GLCall(glActiveTexture(GL_TEXTURE0 + slot));
-	GLCall(glBindTexture(GL_TEXTURE_2D, DepthTarget));
+
+	// Only bind if the depth attachment is actually a texture
+	GLboolean isTex = glIsTexture(DepthTarget);
+	if (isTex == GL_TRUE)
+	{
+		GLCall(glBindTexture(GL_TEXTURE_2D, DepthTarget));
+	}
+	else
+	{
+		// Bind 0 to ensure a clean state and avoid errors; depth is not sampleable in this configuration
+		GLCall(glBindTexture(GL_TEXTURE_2D, 0));
+		LOG_GL_WARN("GBuffer depth attachment is not a texture (likely a renderbuffer). Skipping BindDepthTexture().");
+	}
 }
 
 void OpenGL::Advanced::GBuffer_OpenGL::BindTexture(const unsigned int slot, const unsigned int index)
