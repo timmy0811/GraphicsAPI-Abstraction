@@ -78,19 +78,19 @@ void OpenGL::Core::Shader_OpenGL::SetUniform2f(const std::string& name, const fl
 	GLCall(glUniform2f(GetUniformLocation(name), v0, v1));
 }
 
-void OpenGL::Core::Shader_OpenGL::SetUniform1iv(const std::string& name, const unsigned int size, int* v)
+void OpenGL::Core::Shader_OpenGL::SetUniform1iv(const std::string& name, const unsigned int size, const int* v)
 {
-	GLCall(glUniform1iv(GetUniformLocation(name), size, v));
+	GLCall(glUniform1iv(GetUniformLocation(name), (GLsizei)size, v));
 }
 
-void OpenGL::Core::Shader_OpenGL::SetUniform1fv(const std::string& name, const unsigned int size, float* v)
+void OpenGL::Core::Shader_OpenGL::SetUniform1fv(const std::string& name, const unsigned int size, const float* v)
 {
-	GLCall(glUniform1fv(GetUniformLocation(name), size, v));
+	GLCall(glUniform1fv(GetUniformLocation(name), (GLsizei)size, v));
 }
 
-void OpenGL::Core::Shader_OpenGL::SetUniform3fv(const std::string& name, const unsigned int size, glm::vec3* v)
+void OpenGL::Core::Shader_OpenGL::SetUniform3fv(const std::string& name, const unsigned int size, const glm::vec3* v)
 {
-	GLCall(glUniform3fv(GetUniformLocation(name), size, &v->x));
+	GLCall(glUniform3fv(GetUniformLocation(name), (GLsizei)size, &v->x));
 }
 
 void OpenGL::Core::Shader_OpenGL::SetUniform3f(const std::string& name, const float v0, const float v1, const float v2)

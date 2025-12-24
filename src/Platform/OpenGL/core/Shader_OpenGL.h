@@ -25,9 +25,9 @@ namespace OpenGL::Core
 		void SetUniform3f(const std::string& name, float v0, float v1, float v2) override;
 		void SetUniform4f(const std::string& name, float v0, float v1, float v2, float v3) override;
 
-		void SetUniform1iv(const std::string& name, unsigned int size, int* v) override;
-		void SetUniform1fv(const std::string& name, unsigned int size, float* v) override;
-		void SetUniform3fv(const std::string& name, unsigned int size, glm::vec3* v) override;
+		void SetUniform1iv(const std::string& name, unsigned int size, const int* v) override;
+		void SetUniform1fv(const std::string& name, unsigned int size, const float* v) override;
+		void SetUniform3fv(const std::string& name, unsigned int size, const glm::vec3* v) override;
 
 		// Custom Structures
 		void SetUniformMaterial(const std::string& name, API::material::Material& m) override;

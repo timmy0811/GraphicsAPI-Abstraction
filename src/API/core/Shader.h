@@ -41,9 +41,9 @@ namespace API::Core
 		virtual void SetUniform3f(const std::string& name, float v0, float v1, float v2) = 0;
 		virtual void SetUniform4f(const std::string& name, float v0, float v1, float v2, float v3) = 0;
 
-		virtual void SetUniform1iv(const std::string& name, unsigned int size, int* v) = 0;
-		virtual void SetUniform1fv(const std::string& name, unsigned int size, float* v) = 0;
-		virtual void SetUniform3fv(const std::string& name, unsigned int size, glm::vec3* v) = 0;
+		virtual void SetUniform1iv(const std::string& name, unsigned int size, const int* v) = 0;
+		virtual void SetUniform1fv(const std::string& name, unsigned int size, const float* v) = 0;
+		virtual void SetUniform3fv(const std::string& name, unsigned int size, const glm::vec3* v) = 0;
 
 		// Custom Structures
 		virtual void SetUniformMaterial(const std::string& name, material::Material& m) = 0;
