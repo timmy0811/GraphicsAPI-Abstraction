@@ -6,6 +6,14 @@
 #include <GL/glew.h>
 #include <random>
 
+OpenGL::Advanced::SSAO_OpenGL::~SSAO_OpenGL()
+{
+	if (m_IdNoise != 0)
+	{
+		GLCall(glDeleteTextures(1, &m_IdNoise));
+	}
+}
+
 void OpenGL::Advanced::SSAO_OpenGL::GenerateSSAONoiseMap()
 {
 	std::uniform_real_distribution<GLfloat> randomFloats(0.0, 1.0);

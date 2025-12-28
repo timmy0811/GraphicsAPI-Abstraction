@@ -38,6 +38,9 @@ namespace API::Advanced
 
 		virtual bool Validate() = 0;
 
+		// Resize textures inplace
+		virtual void Resize(unsigned int width, unsigned int height) = 0;
+
 		[[nodiscard]] virtual inline size_t AttachmentCount() const = 0;
 
 		static GBuffer* Create(unsigned int width, unsigned int height);

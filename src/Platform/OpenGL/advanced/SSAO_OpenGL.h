@@ -11,6 +11,7 @@ namespace OpenGL::Advanced
 	{
 	public:
 		SSAO_OpenGL() = default;
+		~SSAO_OpenGL() override;
 
 		void GenerateSSAONoiseMap() override;
 		void BindNoiseTex(unsigned int slot) override;

@@ -82,8 +82,11 @@ int OpenGL::Texture::Texture_OpenGL::Bind(const unsigned int slot)
 
 void OpenGL::Texture::Texture_OpenGL::Unbind()
 {
-	GLCall(glActiveTexture(m_BoundID));
-	GLCall(glBindTexture(GL_TEXTURE_2D, 0));
+	if (m_BoundID >= 0)
+	{
+		GLCall(glActiveTexture(GL_TEXTURE0 + m_BoundID));
+		GLCall(glBindTexture(GL_TEXTURE_2D, 0));
+	}
 	m_BoundID = -1;
 }
 

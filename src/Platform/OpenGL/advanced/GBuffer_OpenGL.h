@@ -9,9 +9,7 @@ namespace OpenGL::Advanced
 	{
 	public:
 		GBuffer_OpenGL(unsigned int width, unsigned int height);
-		~GBuffer_OpenGL() override = default;
-
-		[[nodiscard]] int GetInternalId() const override { return (int)IdGBuffer; }
+		~GBuffer_OpenGL() override;
 
 		void Bind() const override;
 		void BindAndClear() override;
@@ -42,7 +40,11 @@ namespace OpenGL::Advanced
 
 		bool Validate() override;
 
+		// Resize textures in-place
+		void Resize(unsigned int width, unsigned int height) override;
+
 		[[nodiscard]] inline size_t AttachmentCount() const override { return Targets.size(); }
+		[[nodiscard]] int GetInternalId() const override { return static_cast<int>(IdGBuffer); }
 
 	private:
 		struct TextureFormat
@@ -61,6 +63,11 @@ namespace OpenGL::Advanced
 			bool IsBound;
 			unsigned int BoundSlot;
 			GLuint InternalId;
+
+			// Store info for resize
+			GLint InternalFormat;
+			GLenum Format;
+			GLenum Type;
 		};
 
 		unsigned int Width, Height;
@@ -68,6 +75,8 @@ namespace OpenGL::Advanced
 		unsigned int IdGBuffer = 0;
 		std::vector<std::pair<std::string, InternalTargetData>> Targets;
 		unsigned int DepthTarget = 0;
+		API::Core::DepthBufferType DepthBufferType = API::Core::DepthBufferType::WRITE_ONLY;
 		unsigned int StencilTarget = 0;
+		bool HasStencil = false;
 	};
 }

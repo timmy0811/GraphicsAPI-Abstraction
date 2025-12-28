@@ -11,6 +11,62 @@ OpenGL::Advanced::GBuffer_OpenGL::GBuffer_OpenGL(const unsigned int width, const
 	GLCall(glBindFramebuffer(GL_FRAMEBUFFER, IdGBuffer));
 }
 
+OpenGL::Advanced::GBuffer_OpenGL::~GBuffer_OpenGL()
+{
+	// unbind
+	GLint currentFBO = 0;
+	glGetIntegerv(GL_FRAMEBUFFER_BINDING, &currentFBO);
+	if (static_cast<GLuint>(currentFBO) == IdGBuffer)
+	{
+		GLCall(glBindFramebuffer(GL_FRAMEBUFFER, 0));
+	}
+
+	// delete targets
+	for (auto& target : Targets)
+	{
+		if (target.second.InternalId != 0)
+		{
+			GLCall(glDeleteTextures(1, &target.second.InternalId));
+		}
+	}
+	Targets.clear();
+
+	// delete depth target
+	if (DepthTarget != static_cast<GLuint>(0))
+	{
+		if (glIsTexture(DepthTarget))
+		{
+			GLCall(glDeleteTextures(1, &DepthTarget));
+		}
+		else if (glIsRenderbuffer(DepthTarget))
+		{
+			GLCall(glDeleteRenderbuffers(1, &DepthTarget));
+		}
+		DepthTarget = 0;
+	}
+
+	// delete stencil target
+	if (StencilTarget != static_cast<GLuint>(0))
+	{
+		if (glIsTexture(StencilTarget))
+		{
+			GLCall(glDeleteTextures(1, &StencilTarget));
+		}
+		else if (glIsRenderbuffer(StencilTarget))
+		{
+			GLCall(glDeleteRenderbuffers(1, &StencilTarget));
+		}
+		StencilTarget = 0;
+	}
+
+	// delete framebuffer
+	if (IdGBuffer != 0)
+	{
+		GLCall(glDeleteFramebuffers(1, &IdGBuffer));
+		IdGBuffer = 0;
+	}
+}
+
 void OpenGL::Advanced::GBuffer_OpenGL::Bind() const
 {
 	GLCall(glBindFramebuffer(GL_DRAW_FRAMEBUFFER, IdGBuffer));
@@ -27,8 +83,8 @@ void OpenGL::Advanced::GBuffer_OpenGL::BindAndClear()
 
 	GLbitfield clearMask = 0;
 	if (!Targets.empty()) clearMask |= GL_COLOR_BUFFER_BIT;
-	if (DepthTarget != -1) clearMask |= GL_DEPTH_BUFFER_BIT;
-	if (StencilTarget != -1) clearMask |= GL_STENCIL_BUFFER_BIT;
+	if (DepthTarget != 0) clearMask |= GL_DEPTH_BUFFER_BIT;
+	if (StencilTarget != 0) clearMask |= GL_STENCIL_BUFFER_BIT;
 
 	if (clearMask != 0)
 	{
@@ -44,22 +100,19 @@ void OpenGL::Advanced::GBuffer_OpenGL::Unbind()
 void OpenGL::Advanced::GBuffer_OpenGL::BindDepthTexture(const unsigned int slot)
 {
 	// In WRITE_ONLY mode the depth attachment is a renderbuffer, which cannot be bound as a texture.
-	// Guard against invalid binds that would cause GL_INVALID_OPERATION during resizes.
-	if (DepthTarget == (GLuint)-1) {
+	if (DepthTarget == static_cast<GLuint>(0)) {
 		return;
 	}
 
 	GLCall(glActiveTexture(GL_TEXTURE0 + slot));
 
-	// Only bind if the depth attachment is actually a texture
-	GLboolean isTex = glIsTexture(DepthTarget);
-	if (isTex == GL_TRUE)
+	// Only bind if the depth attachment is a texture
+	if (const GLboolean isTex = glIsTexture(DepthTarget); isTex == GL_TRUE)
 	{
 		GLCall(glBindTexture(GL_TEXTURE_2D, DepthTarget));
 	}
 	else
 	{
-		// Bind 0 to ensure a clean state and avoid errors; depth is not sampleable in this configuration
 		GLCall(glBindTexture(GL_TEXTURE_2D, 0));
 		LOG_GL_WARN("GBuffer depth attachment is not a texture (likely a renderbuffer). Skipping BindDepthTexture().");
 	}
@@ -142,12 +195,20 @@ std::string OpenGL::Advanced::GBuffer_OpenGL::GetTargetIdentifier(const unsigned
 unsigned int OpenGL::Advanced::GBuffer_OpenGL::AddRenderTarget(const std::string& identifier, const unsigned int width, const unsigned int height, const unsigned int components,
                                                                const API::Core::BufferDataType datatype, const API::Core::WrapMethod wrap, void* data)
 {
-	Targets.push_back({identifier, {0, 0}});
+	const TextureFormat format = GetTextureFormat(components, datatype);
+
+	InternalTargetData targetData{};
+	targetData.IsBound = false;
+	targetData.BoundSlot = 0;
+	targetData.InternalFormat = format.InternalFormat;
+	targetData.Format = format.Format;
+	targetData.Type = format.Type;
+
+	Targets.emplace_back(identifier, targetData);
 
 	GLCall(glGenTextures(1, &Targets.back().second.InternalId));
 	GLCall(glBindTexture(GL_TEXTURE_2D, Targets.back().second.InternalId));
 
-	TextureFormat format = GetTextureFormat(components, datatype);
 	GLCall(glTexImage2D(GL_TEXTURE_2D, 0, format.InternalFormat, width, height, 0, format.Format, format.Type, data));
 
 	GLCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST));
@@ -163,6 +224,9 @@ unsigned int OpenGL::Advanced::GBuffer_OpenGL::AddRenderTarget(const std::string
 
 	GLCall(glDrawBuffers(Targets.size(), attachments.data()));
 
+	// unbind
+	GLCall(glBindTexture(GL_TEXTURE_2D, 0));
+
 	return Targets.back().second.InternalId;
 }
 
@@ -174,19 +238,22 @@ unsigned int OpenGL::Advanced::GBuffer_OpenGL::AddRenderTarget(const std::string
 
 unsigned int OpenGL::Advanced::GBuffer_OpenGL::AddDepthTarget(const unsigned int width, const unsigned int height, const API::Core::DepthBufferType type)
 {
+	DepthBufferType = type;
+
 	switch (type)
 	{
 	case API::Core::DepthBufferType::WRITE_ONLY:
 		glGenRenderbuffers(1, &DepthTarget);
 		glBindRenderbuffer(GL_RENDERBUFFER, DepthTarget);
-		glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, (int)width, (int)height);
+		glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, static_cast<int>(width), static_cast<int>(height));
 		glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, DepthTarget);
-
+		// unbind
+		glBindRenderbuffer(GL_RENDERBUFFER, 0);
 		break;
 	case API::Core::DepthBufferType::WRITE_READ:
 		GLCall(glGenTextures(1, &DepthTarget));
 		GLCall(glBindTexture(GL_TEXTURE_2D, DepthTarget));
-		GLCall(glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, (int)width, (int)height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, nullptr));
+		GLCall(glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, static_cast<int>(width), static_cast<int>(height), 0, GL_DEPTH_COMPONENT, GL_FLOAT, nullptr));
 
 		GLCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST));
 		GLCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST));
@@ -200,6 +267,8 @@ unsigned int OpenGL::Advanced::GBuffer_OpenGL::AddDepthTarget(const unsigned int
 		GLCall(glDrawBuffer(GL_NONE));
 		GLCall(glReadBuffer(GL_NONE));
 
+		// unbind
+		GLCall(glBindTexture(GL_TEXTURE_2D, 0));
 		break;
 	default:
 		LOG_GL_WARN("DepthBufferType not supported!");
@@ -215,10 +284,15 @@ unsigned int OpenGL::Advanced::GBuffer_OpenGL::AddDepthTarget(const API::Core::D
 
 unsigned int OpenGL::Advanced::GBuffer_OpenGL::AddStencilTarget(const unsigned int width, const unsigned int height)
 {
+	HasStencil = true;
+
 	glGenTextures(1, &StencilTarget);
 	glBindTexture(GL_TEXTURE_2D, StencilTarget);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH24_STENCIL8, width, height, 0, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8, nullptr);
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, StencilTarget, 0);
+
+	// unbind
+	glBindTexture(GL_TEXTURE_2D, 0);
 
 	return StencilTarget;
 }
@@ -241,6 +315,73 @@ bool OpenGL::Advanced::GBuffer_OpenGL::Validate()
 
 	GLCall(glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0));
 	return true;
+}
+
+void OpenGL::Advanced::GBuffer_OpenGL::Resize(const unsigned int width, const unsigned int height)
+{
+	if (width == Width && height == Height)
+	{
+		return;
+	}
+
+	Width = width;
+	Height = height;
+
+	GLCall(glBindFramebuffer(GL_FRAMEBUFFER, IdGBuffer));
+
+	// resize all render targets in-place (keep same texture IDs)
+	for (auto & [identifier, targetData] : Targets)
+	{
+		const auto& target = targetData;
+		GLCall(glBindTexture(GL_TEXTURE_2D, target.InternalId));
+		GLCall(glTexImage2D(GL_TEXTURE_2D, 0, target.InternalFormat, Width, Height, 0,
+		                    target.Format, target.Type, nullptr));
+	}
+	GLCall(glBindTexture(GL_TEXTURE_2D, 0));
+
+	// resize depth target
+	if (DepthTarget != 0)
+	{
+		if (DepthBufferType == API::Core::DepthBufferType::WRITE_ONLY)
+		{
+			GLCall(glBindRenderbuffer(GL_RENDERBUFFER, DepthTarget));
+			GLCall(glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, Width, Height));
+			GLCall(glBindRenderbuffer(GL_RENDERBUFFER, 0));
+		}
+		else
+		{
+			GLCall(glBindTexture(GL_TEXTURE_2D, DepthTarget));
+			GLCall(glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, Width, Height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, nullptr));
+			GLCall(glBindTexture(GL_TEXTURE_2D, 0));
+		}
+	}
+
+	// resize stencil target
+	if (StencilTarget != 0 && HasStencil)
+	{
+		GLCall(glBindTexture(GL_TEXTURE_2D, StencilTarget));
+		GLCall(glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH24_STENCIL8, Width, Height, 0, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8, nullptr));
+		GLCall(glBindTexture(GL_TEXTURE_2D, 0));
+	}
+
+	// re-set draw buffers
+	std::vector<unsigned int> attachments{};
+	for (size_t i = 0; i < Targets.size(); i++)
+		attachments.push_back(GL_COLOR_ATTACHMENT0 + static_cast<unsigned int>(i));
+
+	if (!attachments.empty())
+	{
+		GLCall(glDrawBuffers(static_cast<GLsizei>(attachments.size()), attachments.data()));
+	}
+
+	// validate
+	const GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+	if (status != GL_FRAMEBUFFER_COMPLETE)
+	{
+		LOG_GL_ERROR("GBuffer incomplete after resize. Status: ", std::to_string(status));
+	}
+
+	GLCall(glBindFramebuffer(GL_FRAMEBUFFER, 0));
 }
 
 OpenGL::Advanced::GBuffer_OpenGL::TextureFormat OpenGL::Advanced::GBuffer_OpenGL::GetTextureFormat(const unsigned int components, const API::Core::BufferDataType datatype)

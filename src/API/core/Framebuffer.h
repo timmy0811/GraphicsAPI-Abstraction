@@ -99,7 +99,7 @@ namespace API::Core
 	public:
 		virtual ~Framebuffer() = default;
 
-		virtual void Bind(unsigned int Framebuffer) = 0;
+		virtual void Bind(unsigned int framebufferId) = 0;
 
 		[[nodiscard]] virtual int GetInternalId() const = 0;
 
@@ -114,12 +114,14 @@ namespace API::Core
 		virtual bool PushColorAttribute(char channel = 3, BufferDataType dataType = _FLOAT, const void* data = nullptr) = 0;
 		virtual bool PushColorAttribute(unsigned int internalFormat = 0x881A, unsigned int format = 0x1908, unsigned int dataType = 0x1406, const void* data = nullptr) = 0;
 
-		virtual inline unsigned int GetColorAttachmentTextureID(unsigned int index) = 0;
+		virtual unsigned int GetColorAttachmentTextureID(unsigned int index) = 0;
 
-		[[nodiscard]] virtual inline size_t AttachmentCount() const = 0;
-		virtual inline bool Validate() const = 0;
+		virtual void SetColorAttachmentFilter(unsigned int index, unsigned int filter) = 0;
 
-		virtual inline void Resize(const glm::ivec2& size)
+		[[nodiscard]] virtual size_t AttachmentCount() const = 0;
+		virtual bool Validate() const = 0;
+
+		virtual void Resize(const glm::ivec2& size)
 		{
 			m_Width = size.x;
 			m_Height = size.y;
