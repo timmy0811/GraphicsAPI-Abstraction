@@ -43,6 +43,12 @@ namespace API::Core
 		virtual void CopyStencilBuffer(unsigned int source, unsigned dest, int width, int height) = 0;
 		virtual void CopyDepthBuffer(unsigned int source, unsigned dest, int width, int height) = 0;
 
+		virtual void UnbindAllFramebuffers() = 0;
+		virtual void UnbindShaderProgram() = 0;
+		virtual void UnbindAllTextures(int maxTextureUnits = 32) = 0;
+		virtual void UnbindRenderbuffer() = 0;
+		virtual void ForceSync() = 0;
+
 		virtual void IssueEmptyDrawCall(int instances) = 0;
 		virtual void Draw(const std::shared_ptr<VertexArray>& vertexArray, size_t size) = 0;
 		virtual void DrawIndexed(const std::shared_ptr<VertexArray>& vertexArray, const std::shared_ptr<IndexBuffer>& indexBuffer) = 0;

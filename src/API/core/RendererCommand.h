@@ -127,6 +127,31 @@ namespace API::Core
 			s_RendererAPI->CopyDepthBuffer(source, dest, width, height);
 		}
 
+		inline static void UnbindAllFramebuffers()
+		{
+			s_RendererAPI->UnbindAllFramebuffers();
+		}
+
+		inline static void UnbindShaderProgram()
+		{
+			s_RendererAPI->UnbindShaderProgram();
+		}
+
+		inline static void UnbindAllTextures(const int maxTextureUnits = 32)
+		{
+			s_RendererAPI->UnbindAllTextures(maxTextureUnits);
+		}
+
+		inline static void UnbindRenderbuffer()
+		{
+			s_RendererAPI->UnbindRenderbuffer();
+		}
+
+		inline static void ForceSync()
+		{
+			s_RendererAPI->ForceSync();
+		}
+
 	public:
 		inline static std::string GetAPIVer() { return s_RendererAPI->GetAPIVer(); }
 		inline static std::string GetGPUID() { return s_RendererAPI->GetGPUID(); }

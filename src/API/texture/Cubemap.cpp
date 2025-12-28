@@ -121,7 +121,7 @@ glm::vec2 API::Texture::Cubemap::FindBrightestPoint(const unsigned char* data, c
 
 float API::Texture::Cubemap::CalculateBrightness(const float r, const float g, const float b)
 {
-    return r +g +b;
+    return r + g + b;
 }
 
 API::Texture::Cubemap::Face API::Texture::Cubemap::StringToFace(const std::string& faceStr)

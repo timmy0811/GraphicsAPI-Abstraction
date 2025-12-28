@@ -20,6 +20,12 @@ namespace OpenGL::Core
 		void DrawInstanced(const std::shared_ptr<API::Core::VertexArray>& vertexArray, size_t size, unsigned int instances) override;
 		void DrawInstanced(const std::shared_ptr<API::Core::VertexArray>& vertexArray, const std::shared_ptr<API::Core::IndexBuffer>& indexBuffer, unsigned int instances) override;
 
+		void UnbindAllFramebuffers() override;
+		void UnbindShaderProgram() override;
+		void UnbindAllTextures(int maxTextureUnits = 32) override;
+		void UnbindRenderbuffer() override;
+		void ForceSync() override;
+
 		void SetDepthTest(bool enabled) override;
 		void SetDepthTestFunc(API::Core::DepthFunction func) override;
 		void SetDepthTestRange(float min, float max) override;

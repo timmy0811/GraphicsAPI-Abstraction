@@ -190,3 +190,36 @@ std::string OpenGL::Core::RendererAPI_OpenGL::GetShaderLanID() const
 {
 	return std::string((const char*)glGetString(GL_SHADING_LANGUAGE_VERSION));
 }
+
+void OpenGL::Core::RendererAPI_OpenGL::UnbindAllFramebuffers()
+{
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+}
+
+void OpenGL::Core::RendererAPI_OpenGL::UnbindShaderProgram()
+{
+	glUseProgram(0);
+}
+
+void OpenGL::Core::RendererAPI_OpenGL::UnbindAllTextures(int maxTextureUnits)
+{
+	for (int i = 0; i < maxTextureUnits; ++i)
+	{
+		glActiveTexture(GL_TEXTURE0 + i);
+		glBindTexture(GL_TEXTURE_2D, 0);
+		glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
+	}
+	glActiveTexture(GL_TEXTURE0);
+}
+
+void OpenGL::Core::RendererAPI_OpenGL::UnbindRenderbuffer()
+{
+	glBindRenderbuffer(GL_RENDERBUFFER, 0);
+}
+
+void OpenGL::Core::RendererAPI_OpenGL::ForceSync()
+{
+	glFinish();
+}
