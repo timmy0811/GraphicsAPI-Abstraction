@@ -57,7 +57,7 @@ namespace API::Texture
         static glm::vec3 CalculateAverageColor(const unsigned char* data, int width, int height, int channels, unsigned int sampleCount = 128, float lowerCutoffPercent = 0.f);
         static glm::vec2 FindBrightestPoint(const unsigned char* data, int width, int height, int channels, unsigned int sampleCount = 128, float lowerCutoffPercent = 0.f);
 
-        static inline float CalculateBrightness(float r, float g, float b);
+        static float CalculateBrightness(float r, float g, float b);
 
         static Face StringToFace(const std::string& faceStr);
 
